@@ -33,7 +33,7 @@ public class DetailsTable extends javax.swing.JFrame {
 
         DetailsHeader = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        DTable = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -41,7 +41,7 @@ public class DetailsTable extends javax.swing.JFrame {
         DetailsHeader.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         DetailsHeader.setText("Observing <TYPE> available at <LOCATION> from <FROM> to <TO>");
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        DTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null, null, null, null},
@@ -67,8 +67,8 @@ public class DetailsTable extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(jTable1);
+        DTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(DTable);
 
         jButton1.setText("Close");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -109,15 +109,14 @@ public class DetailsTable extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }
 
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+
     private javax.swing.JLabel DetailsHeader;
     private javax.swing.JButton jButton1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
-    // End of variables declaration//GEN-END:variables
+    private javax.swing.JScrollPane jScrollPane1;//idk why this is here lol
+    private javax.swing.JTable DTable;
 }

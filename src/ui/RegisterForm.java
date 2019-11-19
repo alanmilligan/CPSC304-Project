@@ -125,7 +125,7 @@ public class RegisterForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void RegisterCompleteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RegisterCompleteButtonActionPerformed
+    private void RegisterCompleteButtonActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
     }
 

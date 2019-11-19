@@ -213,12 +213,11 @@ public class Reservation extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void ConfirmResButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConfirmResButtonActionPerformed
+    private void ConfirmResButtonActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
-    }//GEN-LAST:event_ConfirmResButtonActionPerformed
+    }
 
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton ConfirmResButton;
     private javax.swing.JLabel ResCost;
     private javax.swing.JLabel ResDLicense;
@@ -241,5 +240,4 @@ public class Reservation extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
-    // End of variables declaration//GEN-END:variables
 }

@@ -210,9 +210,9 @@ public class ReturnReceipt extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void RRCloseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RRCloseActionPerformed
+    private void RRCloseActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
-    }//GEN-LAST:event_RRCloseActionPerformed
+    }
 
 
     private javax.swing.JButton RRClose;
