@@ -19,6 +19,7 @@ public class DetailsTable extends javax.swing.JFrame {
      */
     public DetailsTable() {
         initComponents();
+
         this.setVisible(true);
     }
 
@@ -117,6 +118,6 @@ public class DetailsTable extends javax.swing.JFrame {
 
     private javax.swing.JLabel DetailsHeader;
     private javax.swing.JButton jButton1;
-    private javax.swing.JScrollPane jScrollPane1;//idk why this is here lol
+    private javax.swing.JScrollPane jScrollPane1;//idk why this is here lol but deleting breaks everything
     private javax.swing.JTable DTable;
 }

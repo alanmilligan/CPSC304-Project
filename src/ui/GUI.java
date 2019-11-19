@@ -1,5 +1,12 @@
 
 package ui;
+
+import com.apple.eawt.Application;
+import database.DataBaseHandler;
+
+import javax.swing.*;
+import java.awt.*;
+
 /**
  *
  * @author alansmacbook
@@ -13,12 +20,21 @@ public class GUI extends javax.swing.JFrame {
     Rental r;
     ReturnReceipt rr;
     Reservation res;
+    DataBaseHandler database;
 
     /**
      * Creates new form GUI
      */
     public GUI() {
         initComponents();
+        database = new DataBaseHandler();// asynchrony??????
+        try {
+            Image sherwyb = new ImageIcon(this.getClass().getResource("/resources/icon.png")).getImage();
+            this.setIconImage(sherwyb);
+            Application.getApplication().setDockIconImage(sherwyb);
+        } catch (Exception e) {
+            System.out.println("sad sherwyb");
+        }
     }
 
     /**
@@ -823,21 +839,22 @@ public class GUI extends javax.swing.JFrame {
         //send the return to the table
     }
 
-
-
     //register new customer, text from ReserveName, ReserveLicense
+    //this will need to insert in to db
     private void NewRegisterButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (rf != null) {rf.dispose();}
         rf = new RegisterForm();
     }
 
     //queries for a reservable vehicle, error handling for none found, text from Reserve+{Type,Location,PDate,PTime,RDate,RTime}
+    //do a query, if it comes back good pick first index i guess and launch a receipt, otherwise throw error message
     private void RequestReserveButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (res != null) {res.dispose();}
         res = new Reservation();
     }
 
-    //opens sublist for details of cars when mouse is pressed on table entry, still need to figure this one out
+    //opens sublist for details of cars when mouse is pressed on table entry
+    //i think the best approach is to put an array of data into the detailstable constructor along with the string at the top
     private void CarSearchTableMousePressed(java.awt.event.MouseEvent evt) {
         if (dt != null) {dt.dispose();}
         dt = new DetailsTable();
