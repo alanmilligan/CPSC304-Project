@@ -12,12 +12,25 @@
 package ui;
 
 
+import database.DataBaseHandler;
+
 public class Rental extends javax.swing.JFrame {
+
+
+    DataBaseHandler database;
 
     /**
      * Creates new form Rental
      */
-    public Rental() {
+    public Rental(DataBaseHandler db) {
+        database = db;
+        initComponents();
+        this.setVisible(true);
+    }
+
+
+    public Rental(DataBaseHandler db, String confNo) {
+        database = db;
         initComponents();
         this.setVisible(true);
     }
@@ -98,7 +111,7 @@ public class Rental extends javax.swing.JFrame {
         RDRDate.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         RDRDate.setText("<RDATE>");
 
-        jLabel4.setText("Confirmation Number");
+        jLabel4.setText("Rental ID");
 
         RDRID.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         RDRID.setText("<RID>");

@@ -11,13 +11,21 @@
 
 package ui;
 
+import database.DataBaseHandler;
+import exceptions.InputException;
+
 public class Reservation extends javax.swing.JFrame {
+
+    DataBaseHandler database;
 
     /**
      * Creates new form Reservation
      */
-    public Reservation() {
+    public Reservation(DataBaseHandler db, String name,String license,String type,String location,
+                       String pdate,String ptime,String rdate,String rtime) throws InputException {
         initComponents();
+        database = db;
+        setValues(name,license,type,location,pdate,ptime,rdate,rtime);
         this.setVisible(true);
     }
 
@@ -213,7 +221,36 @@ public class Reservation extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void setValues(String name,String license,String type,String location,String pdate,String ptime,String rdate,String rtime) throws InputException{
+
+        if (name.equals("") || license.equals("") || type.equals("") || location.equals("") || pdate.equals("") || ptime.equals("")  ||
+                rdate.equals("") ||rtime.equals("")) throw new InputException("Entries must be filled!");
+
+        //query for person on licencse, if it returns nothing throw new InputException("You must register first!");
+
+
+        //add other exception cases here like the time period being wack, its like 8 marks on the rubric. just put custom messages
+
+        ResDLicense.setText(license);
+        ResLocation.setText(location);
+        ResName.setText(name);
+        ResPDate.setText(pdate);
+        ResPTime.setText(ptime);
+        ResRDate.setText(rdate);
+        ResRTime.setText(rtime);
+        ResType.setText(type);
+        ResRID.setText(String.valueOf(420420420)); // this may have to have a unique value so be careful
+
+        ResCost.setText(String.valueOf(calculateCost()));
+    }
+
+    private double calculateCost() {
+        //do the math with the rate and stuff
+        return 0.0;
+    }
+
     private void ConfirmResButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        //do the insertion here i think??
         this.dispose();
     }
 

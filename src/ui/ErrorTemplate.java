@@ -7,6 +7,8 @@
 /**
  *
  * @author alansmacbook
+ *
+ * for all intents and purposes this shoudl be done, just feed it the error string
  */
 
 package ui;

@@ -12,12 +12,18 @@
 package ui;
 
 
+import database.DataBaseHandler;
+import exceptions.InputException;
+
 public class RegisterForm extends javax.swing.JFrame {
+
+    DataBaseHandler database;
 
     /**
      * Creates new form RegisterForm
      */
-    public RegisterForm() {
+    public RegisterForm(DataBaseHandler d) {
+        database = d;
         initComponents();
         this.setVisible(true);
     }
@@ -125,8 +131,28 @@ public class RegisterForm extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+
+    //this will require an insert
     private void RegisterCompleteButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        this.dispose();
+        try {
+            String address = RegisterAddress.getText();
+            String cellNumber = RegisterAddress.getText();
+            String licence = RegisterAddress.getText();
+            String name = RegisterAddress.getText();
+
+            if (address.equals("")||cellNumber.equals("")||licence.equals("")||name.equals("")) {
+                throw new InputException("You have to fill out the form!");
+            }
+
+            //TODO integrity check
+
+            database.addCustomer(address,cellNumber,licence,name);
+
+            this.dispose();
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+        }
+
     }
 
 

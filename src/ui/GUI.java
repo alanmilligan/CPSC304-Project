@@ -109,7 +109,7 @@ public class GUI extends javax.swing.JFrame {
         jLabel17 = new javax.swing.JLabel();
         ClerkRentalConfirmation = new javax.swing.JTextField();
         jLabel30 = new javax.swing.JLabel();
-        FindRegistrationButton = new javax.swing.JButton();
+        FindReservationButton = new javax.swing.JButton();
         jLabel31 = new javax.swing.JLabel();
         NewRentalRTime = new javax.swing.JTextField();
         jLabel32 = new javax.swing.JLabel();
@@ -490,10 +490,10 @@ public class GUI extends javax.swing.JFrame {
 
         jLabel30.setText("Confirmation Number");
 
-        FindRegistrationButton.setText("Find Reservation");
-        FindRegistrationButton.addActionListener(new java.awt.event.ActionListener() {
+        FindReservationButton.setText("Find Reservation");
+        FindReservationButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                FindRegistrationButtonActionPerformed(evt);
+                FindReservationButtonActionPerformed(evt);
             }
         });
 
@@ -576,7 +576,7 @@ public class GUI extends javax.swing.JFrame {
                                                                 .addComponent(jLabel28))
                                                         .addGroup(ClerkPanelLayout.createSequentialGroup()
                                                                 .addGap(77, 77, 77)
-                                                                .addComponent(FindRegistrationButton)
+                                                                .addComponent(FindReservationButton)
                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                                 .addComponent(jLabel27)))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -670,7 +670,7 @@ public class GUI extends javax.swing.JFrame {
                                                         .addComponent(ClerkRentalConfirmation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(jLabel30))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(FindRegistrationButton)
+                                                .addComponent(FindReservationButton)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(jLabel17)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -833,37 +833,63 @@ public class GUI extends javax.swing.JFrame {
         String location = SearchLocation.getText();
         String from = SearchFrom.getText();
         String to = SearchTo.getText();
-        //car search bar query
 
-        //do some sort of execute database handler here
-        //send the return to the table
+        //TODO this should have a return type, and should shove that return value into the table after processing
+        database.searchCars(type,location,from,to);
+
+
     }
 
     //register new customer, text from ReserveName, ReserveLicense
     //this will need to insert in to db
     private void NewRegisterButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (rf != null) {rf.dispose();}
-        rf = new RegisterForm();
+        rf = new RegisterForm(database);
     }
 
     //queries for a reservable vehicle, error handling for none found, text from Reserve+{Type,Location,PDate,PTime,RDate,RTime}
     //do a query, if it comes back good pick first index i guess and launch a receipt, otherwise throw error message
     private void RequestReserveButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (res != null) {res.dispose();}
-        res = new Reservation();
+        try {
+            String name = ReserveName.getText();
+            String license = ReserveLicence.getText();
+            String type = ReserveType.getText();
+            String location = ReserveLocation.getText();
+            String pdate = ReservePDate.getText();
+            String ptime = ReservePTime.getText();
+            String rdate = ReserveRDate.getText();
+            String rtime = ReserveRTime.getText();
+
+            res = new Reservation(database,name,license,type,location,pdate,ptime,rdate,rtime);
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+        }
     }
 
     //opens sublist for details of cars when mouse is pressed on table entry
     //i think the best approach is to put an array of data into the detailstable constructor along with the string at the top
+    //use
     private void CarSearchTableMousePressed(java.awt.event.MouseEvent evt) {
         if (dt != null) {dt.dispose();}
+
+
         dt = new DetailsTable();
     }
 
     //clerk returns a car, text from Return+{RentID,Date,Odometer,Gas}
     private void ReturnButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (rr != null) {rr.dispose();} 
-        rr = new ReturnReceipt();
+        try {
+            if (rr != null) {rr.dispose();}
+            String returnid = ReturnRentID.getText();
+            String date = ReturnDate.getText();
+            String odometer = ReturnOdometer.getText();
+            String gas = ReturnGas.getText();
+            rr = new ReturnReceipt(database,returnid,date,odometer,gas);
+
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+        }
     }
 
     private void CompanyRentalReportActionPerformed(java.awt.event.ActionEvent evt) {
@@ -886,15 +912,37 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }
 
-    private void RequestRentalActionPerformed(java.awt.event.ActionEvent evt) {
+
+    private void FindReservationButtonActionPerformed(java.awt.event.ActionEvent evt) {
         if (r != null) {r.dispose();}
-        r = new Rental();
+        try {
+            String confNo = ClerkRentalConfirmation.getText();
+            r = new Rental(database,confNo);
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+        }
 
     }
 
-    private void FindRegistrationButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void RequestRentalActionPerformed(java.awt.event.ActionEvent evt) {
         if (r != null) {r.dispose();}
-        r = new Rental();
+        try {
+            String name = NewRentalName.getText();
+            String licnece = NewRentalLicence.getText();
+            String type = NewRentalType.getText();
+            String location = NewRentalLocation.getText();
+            String pdate = NewRentalPDate.getText();
+            String ptime = NewRentalPTime.getText();
+            String rdate = NewRentalRDate.getText();
+            String rtime = NewRentalRTime.getText();
+
+            //TODO i died here
+
+            r = new Rental(database);
+
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+        }
     }
 
 
@@ -941,7 +989,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JButton CompanyReturnReport;
     private javax.swing.JPanel CustomerPanel;
     private javax.swing.JButton DeleteButton;
-    private javax.swing.JButton FindRegistrationButton;
+    private javax.swing.JButton FindReservationButton;
     private javax.swing.JButton InsertButton;
     private javax.swing.JButton LocationRentalReport;
     private javax.swing.JButton LocationReturnReport;
