@@ -50,7 +50,7 @@ public class DetailsTable extends javax.swing.JFrame {
                 {null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Vehcile ID", "Licence Plate", "Make", "Model", "Year", "Colour", "Odometer", "vtname", "Location", "City"
+                "Vehicle ID", "Licence Plate", "Make", "Model", "Year", "Colour", "Odometer", "vtname", "Location", "City"
             }
         ) {
             Class[] types = new Class [] {
