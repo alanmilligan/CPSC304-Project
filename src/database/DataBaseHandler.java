@@ -36,7 +36,7 @@ public class DataBaseHandler {
                 connection.close();
             }
 
-            connection = DriverManager.getConnection(ORACLE_URL, "ora_jacquesc", "a17816802");
+            connection = DriverManager.getConnection(ORACLE_URL, "", "");
             connection.setAutoCommit(false);
 
             System.out.println("\nConnected to Oracle!");
