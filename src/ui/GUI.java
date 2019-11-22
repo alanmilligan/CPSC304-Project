@@ -1,7 +1,6 @@
 
 package ui;
 
-import com.apple.eawt.Application;
 import database.DataBaseHandler;
 
 import javax.swing.*;
@@ -28,10 +27,11 @@ public class GUI extends javax.swing.JFrame {
     public GUI() {
         initComponents();
         database = new DataBaseHandler();// asynchrony??????
+
         try {
             Image sherwyb = new ImageIcon(this.getClass().getResource("/resources/icon.png")).getImage();
-            this.setIconImage(sherwyb);
-            Application.getApplication().setDockIconImage(sherwyb);
+            //this.setIconImage(sherwyb);
+            //Application.getApplication().setDockIconImage(sherwyb);
         } catch (Exception e) {
             System.out.println("sad sherwyb");
         }

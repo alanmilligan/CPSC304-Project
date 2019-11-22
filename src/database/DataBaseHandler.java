@@ -1,17 +1,45 @@
 package database;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 public class DataBaseHandler {
 
+    private static final String ORACLE_URL = "jdbc:oracle:thin:@localhost:1522:stu";
+    private static final String EXCEPTION_TAG = "[EXCEPTION]";
+    private static final String WARNING_TAG = "[WARNING]";
+    private Connection connection = null;
 
 
 
     public DataBaseHandler() {
-
+//        try {
+//            // Load the Oracle JDBC driver
+//            // Note that the path could change for new drivers
+//            //DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
+//        } catch (SQLException e) {
+//            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+//        }
     }
 
     //prompt oracle login
-    public void login() {
+    public boolean login(String username, String password) {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
 
+            connection = DriverManager.getConnection(ORACLE_URL, username, password);
+            connection.setAutoCommit(false);
+
+            System.out.println("\nConnected to Oracle!");
+            return true;
+        } catch (SQLException e) {
+            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+            return false;
+        }
     }
 
     //run sql scripts/populate database
@@ -20,9 +48,16 @@ public class DataBaseHandler {
     }
 
 
-     public void addCustomer(String address, String CellNumber, String Licence, String name) {
-         //INSERT INTO Customers VALUES(licence,name,cellnumber,address);
-
+     public void addCustomer(String address, String cellNumber, String license, String name) {
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Customer VALUES (?,?,?,?)");
+            ps.setString(1, cellNumber);
+            ps.setString(2, name);
+            ps.setString(3, address);
+            ps.setString(4, license);
+        } catch (SQLException e) {
+            System.out.println("ERROR");
+        }
      }
 
      //TODO figure out return type
