@@ -74,4 +74,15 @@ public class VehicleType {
                 ", krate=" + krate +
                 '}';
     }
+
+    public String[] getData(){
+        String wrate = String.valueOf(getWrate());
+        String drate = String.valueOf(getDrate());
+        String hrate = String.valueOf(getHrate());
+        String wirate = String.valueOf(getWirate());
+        String dirate = String.valueOf(getDirate());
+        String hirate = String.valueOf(getHirate());
+        String krate = String.valueOf(getKrate());
+        return new String[]{vtname, features, wrate, drate, hrate, wirate, dirate, hirate, krate};
+    }
 }

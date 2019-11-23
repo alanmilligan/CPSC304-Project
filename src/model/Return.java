@@ -47,4 +47,12 @@ public class Return {
                 ", value=" + value +
                 '}';
     }
+
+    public String[] getData(){
+        String rid = String.valueOf(getRid());
+        String rDate = String.valueOf(getrDate());
+        String odometer = String.valueOf(getOdometer());
+        String value = String.valueOf(getValue());
+        return new String[]{rid, rDate, odometer, fulltank, value};
+    }
 }

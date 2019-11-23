@@ -80,4 +80,10 @@ public class Vehicle {
                 ", city='" + city + '\'' +
                 '}';
     }
+
+    public String[] getData(){
+        String year = String.valueOf(getYear());
+        String odometer = String.valueOf(getOdometer());
+        return new String[]{vlicense, make, model, year, color, odometer, status, vtname, location, city};
+    }
 }
