@@ -23,6 +23,7 @@ public class DataBaseHandler {
     public ArrayList<Reservation> reservations = new ArrayList<>();
     public int currConf = 9999;
     public int currRent = 9999;
+    public int emptyTankFee = 100;
 
 
 
@@ -258,7 +259,7 @@ public class DataBaseHandler {
 //        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
 //        searchCars("Sedan", "UBC", "2019-05-02 05:10:00", "2019-04-05 05:10:00");
 //        try {
-//            System.out.println(makeRentNoReservation("Kobe Bryant", "MAMBA25", "Truck",
+//            System.out.println(makeRentNoReservation("Kobe Bryant", "MAMBA24", "Truck",
 //                    "2020-02-02", "03:33:33", "2020-02-03", "03:33:33", "mamba", 1231231231, 32323, "UBC"));
 //            System.out.println(rents.size());
 //        } catch (InputException e) {
@@ -512,10 +513,13 @@ public class DataBaseHandler {
                 ps.setInt(9, rent.getExpDate());
                 ps.setInt(10, rent.getConfNo());
 
-                ps.executeUpdate();
+                PreparedStatement p = connection.prepareStatement("UPDATE Vehicle SET status = 'Rented' WHERE vlicense = ?");
+                p.setString(1, rent.getVlicense());
+                p.executeUpdate();
                 connection.commit();
-                ps.close();
+                p.close();
                 getRents();
+                getVehicles();
                 return rent;
             } catch (SQLException e) {
                 System.out.println("SQL ERROR");
@@ -564,7 +568,14 @@ public class DataBaseHandler {
             ps.executeUpdate();
             connection.commit();
             ps.close();
+
+            PreparedStatement p = connection.prepareStatement("UPDATE Vehicle SET status = 'Rented' WHERE vlicense = ?");
+            p.setString(1, rent.getVlicense());
+            p.executeUpdate();
+            connection.commit();
+            p.close();
             getRents();
+            getVehicles();
             return rent;
         } catch (SQLException e) {
             System.out.println("SQL ERROR");
@@ -574,4 +585,95 @@ public class DataBaseHandler {
         }
     }
 
+
+    public String[] handleReturn(int rentid, String date, int odometer, boolean gas) throws InputException {
+        getRents();
+        Rent r = null;
+        for (Rent rent: rents) {
+            if (rent.getRid() == rentid) {
+                r = rent;
+            }
+        }
+        if (r == null) {
+            throw new InputException("No matching rent ID!");
+        }
+
+        Timestamp rdate = Timestamp.valueOf(date);
+        if (rdate.before(r.getFromDate())) {
+            throw new InputException("Return date is before the start date!");
+        }
+
+        // Get car.
+        getVehicles();
+        Vehicle v = null;
+        for (Vehicle veh: vehicles) {
+            if (veh.getVlicense().equals(r.getVlicense())) {
+                v = veh;
+            }
+        }
+        if (v == null) {
+            throw new InputException("No matching vehicle rented out!");
+        }
+
+        // Get vehicleType.
+        getVehicleTypes();
+        VehicleType vt = null;
+        for (VehicleType vtype: vehicleTypes) {
+            if (vtype.getVtname().equals(v.getVtname())) {
+                vt = vtype;
+            }
+        }
+        if (vt == null) {
+            throw new InputException("No matching vehicle type!");
+        }
+
+        // Calculate Cost.
+        int odometerDiff = odometer - r.getOdometer();
+        if (odometerDiff < 0) {
+            throw new InputException("New odometer value is less than odometer value before rental!");
+        }
+        int kmrate = vt.getKrate();
+        int value = kmrate * odometerDiff;
+        if (!gas) {
+            value += emptyTankFee;
+        }
+
+        String fulltank = gas ? "Y" : "N";
+
+        getReturns();
+        for (Return ret: returns) {
+            if (ret.getRid() == r.getRid()) {
+                throw new InputException("Vehicle for this rental already returned!");
+            }
+        }
+
+        // Insert return value
+        PreparedStatement ps;
+        try {
+            ps = connection.prepareStatement("INSERT INTO Return VALUES (?,?,?,?,?)");
+            ps.setInt(1, r.getRid());
+            ps.setTimestamp(2, rdate);
+            ps.setInt(3, odometer);
+            ps.setString(4, fulltank);
+            ps.setInt(5, value);
+            ps.executeUpdate();
+            connection.commit();
+            ps.close();
+            getReturns();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw new InputException("SQL Error :(");
+        }
+
+        String costExplanation = "Vehicle Type " + vt.getVtname() + " kmRate = " + kmrate + " \n Odometer Difference = " +
+                "" + odometerDiff + "\n KmRate cost = " + odometerDiff + " * " + kmrate + " = " + Integer.toString(odometerDiff * kmrate);
+        if (!gas) {
+            costExplanation = costExplanation + "\n Tank not returned full, added $100 extra cost \n " +
+                    "Final cost = " + value;
+        }
+
+        return new String[] {Integer.toString(r.getRid()), r.getFromDate().toString(), rdate.toString(),
+                Integer.toString(value), costExplanation};
+
+    }
 }
