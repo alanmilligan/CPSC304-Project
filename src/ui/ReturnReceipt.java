@@ -17,7 +17,7 @@ import exceptions.InputException;
 
 public class ReturnReceipt extends javax.swing.JFrame {
 
-
+    DataBaseHandler database;
 
     /**
      * Creates new form ReturnReceipt
@@ -26,25 +26,18 @@ public class ReturnReceipt extends javax.swing.JFrame {
         initComponents();
         //db.query to prove existence, if not then throw here
         //do db stuff to fix statuses and stuff, and get additional data needed
-
-        //TODO make this into embedded shit
-        //SELECT VT.wrate,VT.drate,VT.hrate, R.fromDate, R.fromTime
-        //FROM VehicleType VT, Rent R, Vehcile V
-        //WHERE R.rid="rentid" AND R.vid=V.vid AND V.vtname = VT.vtname;
-
-        //if (query == empty) {throw new InputException("You can't return an unrented car!");}
-        //if (rentid.equals("") || date.equals("") || odometer.equals("") || gas.equals("")) {throw new InputException("You have to put words there!");}
-
-//        RRRID.setText();
-//        RRRDATE.setText();
-//        RRRTIME.setText();
+        database = db;
+        if (rentid.equals("") || date.equals("") || odometer.equals("") || gas.equals("")) {throw new InputException("Missing inputs!");}
+        String[] receiptInfo = db.handleReturn(Integer.parseInt(rentid), date, Integer.parseInt(odometer), Boolean.parseBoolean(gas));
+        RRRID.setText(receiptInfo[0]);
+        RRRDATE.setText(receiptInfo[1]);
 //        RRWRATE.setText();
 //        RRDRATE.setText();
 //        RRHRATE.setText();
 //        RRWEEKS.setText();
 //        RRDAYS.setText();
-//        RRHOURS.setText();
-//        RRTOTAL.setText(String.valueOf(calculateTotal()));
+        RRHOURS.setText(receiptInfo[3]);
+        RRTOTAL.setText(receiptInfo[4]);
 
 
         this.setVisible(true);
@@ -240,10 +233,6 @@ public class ReturnReceipt extends javax.swing.JFrame {
         this.dispose();
     }
 
-    private double calculateTotal(String from, String to) {
-        //TODO i really dont want to do this but we need it in 2 places
-        return 0.0;
-    }
 
     private javax.swing.JButton RRClose;
     private javax.swing.JLabel RRDAYS;

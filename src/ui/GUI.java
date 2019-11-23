@@ -489,11 +489,11 @@ public class GUI extends javax.swing.JFrame {
 
         jLabel25.setText("Rent ID");
 
-        jLabel26.setText("Date");
+        jLabel26.setText("Date and Time");
 
         jLabel27.setText("Odometer");
 
-        jLabel28.setText("Gas Tank");
+        jLabel28.setText("Gas Tank Full?");
 
         jLabel16.setFont(new java.awt.Font("Lucida Grande", 1, 13)); // NOI18N
         jLabel16.setText("With Reservation");
