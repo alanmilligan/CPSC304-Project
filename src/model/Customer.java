@@ -39,5 +39,9 @@ public class Customer {
                 ", dlicense='" + dlicense + '\'' +
                 '}';
     }
+
+    public String[] getData(){
+        return new String[]{cell, name, address, dlicense};
+    }
 }
 

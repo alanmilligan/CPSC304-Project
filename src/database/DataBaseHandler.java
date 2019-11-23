@@ -94,7 +94,7 @@ public class DataBaseHandler {
         }
     }
 
-    public void getCustomers() {
+    public ArrayList<Customer> getCustomers() {
         customers = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -110,9 +110,10 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(customers);
+        return customers;
     }
 
-    public void getVehicleTypes() {
+    public ArrayList<VehicleType> getVehicleTypes() {
         vehicleTypes = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -130,10 +131,10 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(vehicleTypes);
-
+        return vehicleTypes;
     }
 
-    public void getVehicles() {
+    public ArrayList<Vehicle> getVehicles() {
         vehicles = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -151,9 +152,10 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(vehicles);
+        return vehicles;
     }
 
-    public void getReservations() {
+    public ArrayList<Reservation> getReservations() {
         reservations = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -177,9 +179,11 @@ public class DataBaseHandler {
             }
         }
         currConf = curr + 1;
+
+        return reservations;
     }
 
-    public void getRents() {
+    public ArrayList<Rent> getRents() {
         rents = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -198,6 +202,7 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(rents);
+
         int curr = -1;
         for (Rent r: rents) {
             if (r.getRid() > curr) {
@@ -206,9 +211,10 @@ public class DataBaseHandler {
         }
         currRent = curr + 1;
 
+        return rents;
     }
 
-    public void getReturns() {
+    public ArrayList<Return> getReturns() {
         returns = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -225,7 +231,7 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(returns);
-
+        return returns;
     }
 
     //run sql scripts/populate database
