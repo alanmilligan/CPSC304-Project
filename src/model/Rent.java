@@ -83,4 +83,14 @@ public class Rent {
     public int getConfNo() {
         return confNo;
     }
+
+    public String[] getData() {
+        String fromDate = String.valueOf(getFromDate());
+        String toDate = String.valueOf(getToDate());
+        String rid = String.valueOf(getRid());
+        String odometer = String.valueOf(getOdometer());
+        String cardNo = String.valueOf(getCardNo());
+        String expDate = String.valueOf(getExpDate());
+        String confNum = String.valueOf(getConfNo());
+        return new String[]{rid, vlicense, dlicense, fromDate, toDate, odometer, CardName, cardNo, expDate, confNum};}
 }

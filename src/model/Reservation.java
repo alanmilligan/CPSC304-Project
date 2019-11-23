@@ -48,4 +48,11 @@ public class Reservation {
                 ", toDate=" + toDate +
                 '}';
     }
+
+    public String[] getData(){
+        String fromDate = String.valueOf(getFromDate());
+        String toDate = String.valueOf(getToDate());
+        String confNum = String.valueOf(getConfNo());
+        return new String[]{confNum, vtname, dlicense, fromDate, toDate};
+    }
 }

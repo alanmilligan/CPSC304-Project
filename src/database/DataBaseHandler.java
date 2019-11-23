@@ -91,7 +91,7 @@ public class DataBaseHandler {
         }
     }
 
-    public void getCustomers() {
+    public ArrayList<Customer> getCustomers() {
         customers = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -107,9 +107,10 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(customers);
+        return customers;
     }
 
-    public void getVehicleTypes() {
+    public ArrayList<VehicleType> getVehicleTypes() {
         vehicleTypes = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -127,10 +128,10 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(vehicleTypes);
-
+        return vehicleTypes;
     }
 
-    public void getVehicles() {
+    public ArrayList<Vehicle> getVehicles() {
         vehicles = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -148,9 +149,10 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(vehicles);
+        return vehicles;
     }
 
-    public void getReservations() {
+    public ArrayList<Reservation> getReservations() {
         reservations = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -167,9 +169,10 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(reservations);
+        return reservations;
     }
 
-    public void getRents() {
+    public ArrayList<Rent> getRents() {
         rents = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -188,10 +191,10 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(rents);
-
+        return rents;
     }
 
-    public void getReturns() {
+    public ArrayList<Return> getReturns() {
         returns = new ArrayList<>();
         try {
             Statement stmt = connection.createStatement();
@@ -208,6 +211,7 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(returns);
+        return returns;
     }
 
     //run sql scripts/populate database
@@ -221,37 +225,19 @@ public class DataBaseHandler {
 //        } catch (SQLException e) {
 //            System.out.println("Error setting up database");
 //        }
-//        getCustomers();
-//        getRents();
-//        getReservations();
-//        getReturns();
-//        getVehicleTypes();
-//        getVehicles();
+
+        getCustomers();
+        getRents();
+        getReservations();
+        getReturns();
+        getVehicleTypes();
+        getVehicles();
+        searchCars("Sedan", "Kits", "", "");
+        searchCars("", "UBC", "", "");
+        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
+        searchCars("Sedan", "UBC", "2019-05-02 05:10:00", "2019-04-05 05:10:00");
     }
 
-// DELETE THIS DELETE THIS DELETE THIS IN FINAL COPY
-//    public void insertBranch(BranchModel model) {
-//        try {
-//            PreparedStatement ps = connection.prepareStatement("INSERT INTO branch VALUES (?,?,?,?,?)");
-//            ps.setInt(1, model.getId());
-//            ps.setString(2, model.getName());
-//            ps.setString(3, model.getAddress());
-//            ps.setString(4, model.getCity());
-//            if (model.getPhoneNumber() == 0) {
-//                ps.setNull(5, java.sql.Types.INTEGER);
-//            } else {
-//                ps.setInt(5, model.getPhoneNumber());
-//            }
-//
-//            ps.executeUpdate();
-//            connection.commit();
-//
-//            ps.close();
-//        } catch (SQLException e) {
-//            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
-//            rollbackConnection();
-//        }
-//    }
 
     // add functions: inserts NEW values into the tables
 
@@ -302,6 +288,7 @@ public class DataBaseHandler {
          }
      }
 
+
     public void deleteReturn(int rid) {
         try {
             getReturns();
@@ -320,15 +307,93 @@ public class DataBaseHandler {
         }
     }
 
+     public ArrayList<Vehicle> searchCars(String type,String location,String from,String to) {
+        ArrayList<Vehicle> result = new ArrayList<>();
+         if (type.equals("")) {
+             type = "%";
+         } if (location.equals("")) {
+             location = "%";
+         }
+         try {
+             PreparedStatement ps;
+             if (from.equals("")) {
+                 ps = connection.prepareStatement
+                         ("SELECT * FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                 System.out.println("SELECT * FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                 ps.setString(1, type);
+                 ps.setString(2, location);
+             } else {
+                 Timestamp startDate = Timestamp.valueOf(from);
+                 Timestamp endDate = Timestamp.valueOf(to);
+                 if (startDate.after(endDate)) {
+                     System.out.println("Improper dates!");
+                     //Todo SHOW GUI ERROR for improper dates.
+                     return new ArrayList<>();
+                 }
+                 ps = connection.prepareStatement("SELECT * FROM Vehicle v WHERE v.vtname LIKE ? AND " +
+                         "v.location LIKE ? AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (" +
+                         "r.toDate > ?) AND (r.fromDate < ?))");
+                 System.out.println("SELECT * FROM Vehicle v WHERE v.vtname LIKE '?' AND v.location LIKE '?' AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (r.toDate > ?) AND (r.fromDate < ?))");
+                 ps.setString(1, type);
+                 ps.setString(2, location);
+                 ps.setTimestamp(3, startDate);
+                 ps.setTimestamp(4, endDate);
+             }
+             ResultSet rs = ps.executeQuery();
+             while(rs.next()) {
+                 Vehicle v = new Vehicle(rs.getString("vlicense"), rs.getString("make"),
+                         rs.getString("model"), rs.getInt("year"), rs.getString("color"),
+                         rs.getInt("odometer"), rs.getString("status"), rs.getString("vtname"),
+                         rs.getString("location"), rs.getString("city"));
+                 result.add(v);
+             }
+             rs.close();
+             ps.close();
+             System.out.println(result);
 
-     //TODO figure out return type
-     public void searchCars(String type,String location,String from,String to) {
+             // GET COUNT
+             PreparedStatement p;
+             if (from.equals("")) {
+                 p = connection.prepareStatement
+                         ("SELECT COUNT(*) as total FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                 System.out.println("SELECT COUNT(*) as total FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                 p.setString(1, type);
+                 p.setString(2, location);
+             } else {
+                 Timestamp startDate = Timestamp.valueOf(from);
+                 Timestamp endDate = Timestamp.valueOf(to);
+                 if (startDate.after(endDate)) {
+                     System.out.println("Improper dates!");
+                     //Todo SHOW GUI ERROR for improper dates.
+                     return new ArrayList<>();
+                 }
+                 p = connection.prepareStatement("SELECT COUNT(*) as total FROM Vehicle v WHERE v.vtname LIKE ? AND " +
+                         "v.location LIKE ? AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (" +
+                         "r.toDate > ?) AND (r.fromDate < ?))");
+                 System.out.println("SELECT COUNT(*) as total FROM Vehicle v WHERE v.vtname LIKE '?' AND v.location LIKE '?' AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (r.toDate > ?) AND (r.fromDate < ?))");
+                 p.setString(1, type);
+                 p.setString(2, location);
+                 p.setTimestamp(3, startDate);
+                 p.setTimestamp(4, endDate);
+             }
+             ResultSet r = p.executeQuery();
+             r.next();
+             int count = r.getInt("total");
+             r.close();
+             p.close();
+             System.out.println(count);
+             if (count != result.size()) {
+                 System.out.println("WEIRd error with count");
+             }
 
-         if (type.equals("")){type = "*";}
-         //some sorta blank date functionality that removes the where not exists
+         } catch (SQLException e) {
+             System.out.println(e.getMessage());
+         } catch (IllegalArgumentException e) {
+             //TODO SHOW GUI error for improper date.
+             System.out.println(e.getMessage());
+         }
 
-
-         //TODO figure this one out since reservations are done by type not by actual vehicle so it will be hard to count
+         return result;
 
          //SELECT V.type, V.location, from, to, COUNT(DISTINCT(V.vid))
          //FROM Vehicle V,

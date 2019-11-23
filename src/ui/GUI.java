@@ -2,9 +2,12 @@
 package ui;
 
 import database.DataBaseHandler;
+import model.*;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -729,7 +732,12 @@ public class GUI extends javax.swing.JFrame {
         jScrollPane2.setViewportView(TableTable);
 
         // TODO add tables here
-        TableDropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Customer", "Item 2", "Item 3", "Item 4" }));
+        TableDropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Customer", "Rent", "Reservation", "Return", "Vehicle", "VehicleType" }));
+        TableDropdown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TableDropdownActionPerformed(evt);
+            }
+        });
 
         jLabel20.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel20.setText("Table:");
@@ -850,7 +858,7 @@ public class GUI extends javax.swing.JFrame {
         String to = SearchTo.getText();
 
         //TODO this should have a return type, and should shove that return value into the table after processing
-        database.searchCars(type,location,from,to);
+        ArrayList<Vehicle> result = database.searchCars(type,location,from,to);
 
 
     }
@@ -938,6 +946,93 @@ public class GUI extends javax.swing.JFrame {
     private void DeleteActionPerformed(java.awt.event.ActionEvent evt) {
         database.deleteReturn(Integer.parseInt(TupleEntry.getText()));
     }
+
+    // TODO update action goes somewhere here
+
+    // TODO Make sure this display table function works
+    private void TableDropdownActionPerformed(java.awt.event.ActionEvent evt){
+        String table = String.valueOf(TableDropdown.getSelectedItem());
+        if(table == "Customer") {
+            DisplayCustomerTable();
+        } else if (table == "Rent") {
+            DisplayRentTable();
+        } else if (table == "Reservation") {
+            DisplayReservationTable();
+        } else if (table == "Return") {
+            DisplayReturnTable();
+        } else if (table == "Vehicle") {
+            DisplayVehicleTable();
+        } else if (table == "VehicleType") {
+            DisplayVehicleTypeTable();
+        }
+    }
+
+    private void DisplayCustomerTable() {
+        String colNames[] = {"cellphone", "name", "address", "dlicense"};
+        DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+        java.util.List<Customer> customers = database.getCustomers();
+        for(int x = 0, y = customers.size(); x < y; x++) {
+            Customer c = customers.get(x);
+            dtm.addRow(c.getData());
+        }
+        TableTable.setModel(dtm);
+    }
+
+    private void DisplayRentTable() {
+        String colNames[] = {"rid", "vlicense", "dlicense", "fromDate", "toDate", "odometer", "cardName", "cardNo", "expDate", "confNo"};
+        DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+        java.util.List<Rent> rentals = database.getRents();
+        for(int x = 0, y = rentals.size(); x < y; x++) {
+            Rent r = rentals.get(x);
+            dtm.addRow(r.getData());
+        }
+        TableTable.setModel(dtm);
+    }
+
+    private void DisplayReservationTable() {
+        String colNames[] = {"confNo", "vtname", "dlicense", "fromDate", "toDate"};
+        DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+        java.util.List<model.Reservation> reservations = database.getReservations();
+        for(int x = 0, y = reservations.size(); x < y; x++) {
+            model.Reservation r = reservations.get(x);
+            dtm.addRow(r.getData());
+        }
+        TableTable.setModel(dtm);
+    }
+
+    private void DisplayReturnTable() {
+        String colNames[] = {"rid", "rDate", "odometer", "fullTank", "value"};
+        DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+        java.util.List<Return> returns = database.getReturns();
+        for(int x = 0, y = returns.size(); x < y; x++) {
+            Return r = returns.get(x);
+            dtm.addRow(r.getData());
+        }
+        TableTable.setModel(dtm);
+    }
+
+    private void DisplayVehicleTable() {
+        String colNames[] = {"vlicense", "make", "model", "year", "color", "odometer", "status", "vtname", "location", "city"};
+        DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+        java.util.List<Vehicle> vehicles = database.getVehicles();
+        for(int x = 0, y = vehicles.size(); x < y; x++) {
+            Vehicle v = vehicles.get(x);
+            dtm.addRow(v.getData());
+        }
+        TableTable.setModel(dtm);
+    }
+
+    private void DisplayVehicleTypeTable() {
+        String colNames[] = {"vtname", "features", "wrate", "drate", "hrate", "wirate", "dirate", "hirate", "krate"};
+        DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+        java.util.List<VehicleType> types = database.getVehicleTypes();
+        for(int x = 0, y = types.size(); x < y; x++) {
+            VehicleType vt = types.get(x);
+            dtm.addRow(vt.getData());
+        }
+        TableTable.setModel(dtm);
+    }
+
 
 
 
