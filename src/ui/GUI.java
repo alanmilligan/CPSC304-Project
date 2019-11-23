@@ -2,9 +2,11 @@
 package ui;
 
 import database.DataBaseHandler;
+import model.Vehicle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -835,7 +837,7 @@ public class GUI extends javax.swing.JFrame {
         String to = SearchTo.getText();
 
         //TODO this should have a return type, and should shove that return value into the table after processing
-        database.searchCars(type,location,from,to);
+        ArrayList<Vehicle> result = database.searchCars(type,location,from,to);
 
 
     }

@@ -36,7 +36,7 @@ public class DataBaseHandler {
                 connection.close();
             }
 
-            connection = DriverManager.getConnection(ORACLE_URL, "", "");
+            connection = DriverManager.getConnection(ORACLE_URL, "ora_jacquesc", "a17816802");
             connection.setAutoCommit(false);
 
             System.out.println("\nConnected to Oracle!");
@@ -208,6 +208,7 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(returns);
+
     }
 
     //run sql scripts/populate database
@@ -227,6 +228,10 @@ public class DataBaseHandler {
         getReturns();
         getVehicleTypes();
         getVehicles();
+        searchCars("Sedan", "Kits", "", "");
+        searchCars("", "UBC", "", "");
+        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
+        searchCars("Sedan", "UBC", "2019-05-02 05:10:00", "2019-04-05 05:10:00");
     }
 
 
@@ -246,14 +251,93 @@ public class DataBaseHandler {
 
      }
 
-     //TODO figure out return type
-     public void searchCars(String type,String location,String from,String to) {
+     public ArrayList<Vehicle> searchCars(String type,String location,String from,String to) {
+        ArrayList<Vehicle> result = new ArrayList<>();
+         if (type.equals("")) {
+             type = "%";
+         } if (location.equals("")) {
+             location = "%";
+         }
+         try {
+             PreparedStatement ps;
+             if (from.equals("")) {
+                 ps = connection.prepareStatement
+                         ("SELECT * FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                 System.out.println("SELECT * FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                 ps.setString(1, type);
+                 ps.setString(2, location);
+             } else {
+                 Timestamp startDate = Timestamp.valueOf(from);
+                 Timestamp endDate = Timestamp.valueOf(to);
+                 if (startDate.after(endDate)) {
+                     System.out.println("Improper dates!");
+                     //Todo SHOW GUI ERROR for improper dates.
+                     return new ArrayList<>();
+                 }
+                 ps = connection.prepareStatement("SELECT * FROM Vehicle v WHERE v.vtname LIKE ? AND " +
+                         "v.location LIKE ? AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (" +
+                         "r.toDate > ?) AND (r.fromDate < ?))");
+                 System.out.println("SELECT * FROM Vehicle v WHERE v.vtname LIKE '?' AND v.location LIKE '?' AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (r.toDate > ?) AND (r.fromDate < ?))");
+                 ps.setString(1, type);
+                 ps.setString(2, location);
+                 ps.setTimestamp(3, startDate);
+                 ps.setTimestamp(4, endDate);
+             }
+             ResultSet rs = ps.executeQuery();
+             while(rs.next()) {
+                 Vehicle v = new Vehicle(rs.getString("vlicense"), rs.getString("make"),
+                         rs.getString("model"), rs.getInt("year"), rs.getString("color"),
+                         rs.getInt("odometer"), rs.getString("status"), rs.getString("vtname"),
+                         rs.getString("location"), rs.getString("city"));
+                 result.add(v);
+             }
+             rs.close();
+             ps.close();
+             System.out.println(result);
 
-         if (type.equals("")){type = "*";}
-         //some sorta blank date functionality that removes the where not exists
+             // GET COUNT
+             PreparedStatement p;
+             if (from.equals("")) {
+                 p = connection.prepareStatement
+                         ("SELECT COUNT(*) as total FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                 System.out.println("SELECT COUNT(*) as total FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                 p.setString(1, type);
+                 p.setString(2, location);
+             } else {
+                 Timestamp startDate = Timestamp.valueOf(from);
+                 Timestamp endDate = Timestamp.valueOf(to);
+                 if (startDate.after(endDate)) {
+                     System.out.println("Improper dates!");
+                     //Todo SHOW GUI ERROR for improper dates.
+                     return new ArrayList<>();
+                 }
+                 p = connection.prepareStatement("SELECT COUNT(*) as total FROM Vehicle v WHERE v.vtname LIKE ? AND " +
+                         "v.location LIKE ? AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (" +
+                         "r.toDate > ?) AND (r.fromDate < ?))");
+                 System.out.println("SELECT COUNT(*) as total FROM Vehicle v WHERE v.vtname LIKE '?' AND v.location LIKE '?' AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (r.toDate > ?) AND (r.fromDate < ?))");
+                 p.setString(1, type);
+                 p.setString(2, location);
+                 p.setTimestamp(3, startDate);
+                 p.setTimestamp(4, endDate);
+             }
+             ResultSet r = p.executeQuery();
+             r.next();
+             int count = r.getInt("total");
+             r.close();
+             p.close();
+             System.out.println(count);
+             if (count != result.size()) {
+                 System.out.println("WEIRd error with count");
+             }
 
+         } catch (SQLException e) {
+             System.out.println(e.getMessage());
+         } catch (IllegalArgumentException e) {
+             //TODO SHOW GUI error for improper date.
+             System.out.println(e.getMessage());
+         }
 
-         //TODO figure this one out since reservations are done by type not by actual vehicle so it will be hard to count
+         return result;
 
          //SELECT V.type, V.location, from, to, COUNT(DISTINCT(V.vid))
          //FROM Vehicle V,
