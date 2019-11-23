@@ -25,7 +25,7 @@ public class Reservation extends javax.swing.JFrame {
                        String pdate,String ptime,String rdate,String rtime) throws InputException {
         initComponents();
         database = db;
-        setValues(name,license,type,location,pdate,ptime,rdate,rtime);
+        setValues(name,license,type,location, pdate,ptime,rdate,rtime);
         this.setVisible(true);
     }
 
@@ -64,11 +64,11 @@ public class Reservation extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        jLabel1.setText("Your Reservation Details");
+        jLabel1.setText("Reservation Confirmed");
 
         jLabel2.setText("Name");
 
-        ConfirmResButton.setText("Confirm Reservation");
+        ConfirmResButton.setText("Close");
         ConfirmResButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ConfirmResButtonActionPerformed(evt);
@@ -221,25 +221,25 @@ public class Reservation extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void setValues(String name,String license,String type,String location,String pdate,String ptime,String rdate,String rtime) throws InputException{
+    private void setValues(String name,String license,String type,String location, String pdate,String ptime,String rdate,String rtime) throws InputException{
 
-        if (name.equals("") || license.equals("") || type.equals("") || location.equals("") || pdate.equals("") || ptime.equals("")  ||
+        if (license.equals("") || type.equals("") || location.equals("")  || pdate.equals("") || ptime.equals("")  ||
                 rdate.equals("") ||rtime.equals("")) throw new InputException("Entries must be filled!");
 
         //query for person on licencse, if it returns nothing throw new InputException("You must register first!");
-
+        model.Reservation r = database.makeReservation(name, license, type, location, pdate, ptime, rdate, rtime);
 
         //add other exception cases here like the time period being wack, its like 8 marks on the rubric. just put custom messages
 
-        ResDLicense.setText(license);
+        ResDLicense.setText(r.getDlicense());
         ResLocation.setText(location);
         ResName.setText(name);
-        ResPDate.setText(pdate);
-        ResPTime.setText(ptime);
-        ResRDate.setText(rdate);
-        ResRTime.setText(rtime);
-        ResType.setText(type);
-        ResRID.setText(String.valueOf(420420420)); // this may have to have a unique value so be careful
+        ResPDate.setText(r.getFromDate().toString());
+        ResPTime.setText(r.getFromDate().toString());
+        ResRDate.setText(r.getToDate().toString());
+        ResRTime.setText(r.getToDate().toString());
+        ResType.setText(r.getVtname());
+        ResRID.setText(Integer.toString(r.getConfNo())); // this may have to have a unique value so be careful
 
         ResCost.setText(String.valueOf(calculateCost()));
     }
