@@ -647,10 +647,9 @@ public class DataBaseHandler {
             }
         }
 
-        // Insert return value
-        PreparedStatement ps;
+        // Insert return value, update car.
         try {
-            ps = connection.prepareStatement("INSERT INTO Return VALUES (?,?,?,?,?)");
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Return VALUES (?,?,?,?,?)");
             ps.setInt(1, r.getRid());
             ps.setTimestamp(2, rdate);
             ps.setInt(3, odometer);
@@ -660,6 +659,13 @@ public class DataBaseHandler {
             connection.commit();
             ps.close();
             getReturns();
+            PreparedStatement p = connection.prepareStatement("UPDATE  Vehicle SET status = 'Available', odometer = ? " +
+                    "WHERE vlicense = ?");
+            p.setInt(1, odometer);
+            p.setString(2, v.getVlicense());
+            p.executeUpdate();
+            connection.commit();
+            p.close();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             throw new InputException("SQL Error :(");
