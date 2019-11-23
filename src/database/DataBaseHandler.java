@@ -36,7 +36,7 @@ public class DataBaseHandler {
                 connection.close();
             }
 
-            connection = DriverManager.getConnection(ORACLE_URL, "", "");
+            connection = DriverManager.getConnection(ORACLE_URL, "ora_jacquesc", "a17816802");
             connection.setAutoCommit(false);
 
             System.out.println("\nConnected to Oracle!");
@@ -221,30 +221,105 @@ public class DataBaseHandler {
 //        } catch (SQLException e) {
 //            System.out.println("Error setting up database");
 //        }
-        getCustomers();
-        getRents();
-        getReservations();
-        getReturns();
-        getVehicleTypes();
-        getVehicles();
+//        getCustomers();
+//        getRents();
+//        getReservations();
+//        getReturns();
+//        getVehicleTypes();
+//        getVehicles();
     }
 
+// DELETE THIS DELETE THIS DELETE THIS IN FINAL COPY
+//    public void insertBranch(BranchModel model) {
+//        try {
+//            PreparedStatement ps = connection.prepareStatement("INSERT INTO branch VALUES (?,?,?,?,?)");
+//            ps.setInt(1, model.getId());
+//            ps.setString(2, model.getName());
+//            ps.setString(3, model.getAddress());
+//            ps.setString(4, model.getCity());
+//            if (model.getPhoneNumber() == 0) {
+//                ps.setNull(5, java.sql.Types.INTEGER);
+//            } else {
+//                ps.setInt(5, model.getPhoneNumber());
+//            }
+//
+//            ps.executeUpdate();
+//            connection.commit();
+//
+//            ps.close();
+//        } catch (SQLException e) {
+//            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
+//            rollbackConnection();
+//        }
+//    }
 
-     public void addCustomer(String address, String cellNumber, String license, String name) {
+    // add functions: inserts NEW values into the tables
+
+    private void rollbackConnection() {
+        try {
+            connection.rollback();
+        } catch (SQLException e) {
+            System.out.println("ERROR");
+        }
+    }
+
+     public void addCustomer(String cellNumber, String name, String address, String license) {
         try {
             PreparedStatement ps = connection.prepareStatement("INSERT INTO Customer VALUES (?,?,?,?)");
             ps.setString(1, cellNumber);
             ps.setString(2, name);
             ps.setString(3, address);
             ps.setString(4, license);
+
+            ps.executeUpdate();
+            connection.commit();
+            ps.close();
+            getCustomers();
         } catch (SQLException e) {
             System.out.println("ERROR");
+            rollbackConnection();
         }
      }
 
-     public void deleteCustomer(String license) {
-
+     public void updateCustomer(String cellNumber, String name, String address, String license) {
+         try {
+             getCustomers();
+             PreparedStatement ps = connection.prepareStatement("UPDATE Customer SET cellphone = ?, name = ?, address = ? WHERE dlicense = ?");
+             ps.setString(1, cellNumber);
+             ps.setString(2, name);
+             ps.setString(3, address);
+             ps.setString(4, license);
+             int rowCount = ps.executeUpdate();
+             if (rowCount == 0) {
+                 System.out.println("ERROR" + " Customer with license " + license + " does not exist!");
+             }
+             connection.commit();
+             ps.close();
+             getCustomers();
+         } catch (SQLException e) {
+             System.out.println("ERROR");
+             rollbackConnection();
+         }
      }
+
+    public void deleteReturn(int rid) {
+        try {
+            getReturns();
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM Return WHERE rid = ?");
+            ps.setInt(1, rid);
+            int rowCount = ps.executeUpdate();
+            if (rowCount == 0) {
+                System.out.println("ERROR" + " Return with rid " + rid + " does not exist!");
+            }
+            connection.commit();
+            ps.close();
+            getReturns();
+        } catch (SQLException e) {
+            System.out.println("ERROR");
+            rollbackConnection();
+        }
+    }
+
 
      //TODO figure out return type
      public void searchCars(String type,String location,String from,String to) {
