@@ -6,7 +6,11 @@ import model.Vehicle;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
+
 import java.util.ArrayList;
+
 
 /**
  *
@@ -727,12 +731,14 @@ public class GUI extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(TableTable);
 
-        TableDropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        // TODO add tables here
+        TableDropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Customer", "Item 2", "Item 3", "Item 4" }));
 
         jLabel20.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel20.setText("Table:");
 
-        jLabel21.setText("Format: (val1,val2,...,valn)");
+        // TODO add instructions for deletion and update here
+        jLabel21.setText("Insert Customer: (cellphone, name, address, dlicense) | Delete Return: (rid)");
 
         TupleEntry.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -743,8 +749,18 @@ public class GUI extends javax.swing.JFrame {
         jLabel22.setText("Tuple:");
 
         InsertButton.setText("Insert");
+        InsertButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                InsertActionPerformed(evt);
+            }
+        });
 
         DeleteButton.setText("Delete");
+        DeleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeleteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout TablePanelLayout = new javax.swing.GroupLayout(TablePanel);
         TablePanel.setLayout(TablePanelLayout);
@@ -913,6 +929,19 @@ public class GUI extends javax.swing.JFrame {
     private void TupleEntryActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
     }
+
+    private void InsertActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+        // Inserts into the Customer table
+        String attributes = TupleEntry.getText();
+        List<String> insertList = Arrays.asList(attributes.split("\\s*,\\s*"));
+        database.addCustomer(insertList.get(0), insertList.get(1), insertList.get(2), insertList.get(3));
+    }
+
+    private void DeleteActionPerformed(java.awt.event.ActionEvent evt) {
+        database.deleteReturn(Integer.parseInt(TupleEntry.getText()));
+    }
+
 
 
     private void FindReservationButtonActionPerformed(java.awt.event.ActionEvent evt) {
