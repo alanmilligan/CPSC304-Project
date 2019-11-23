@@ -1,5 +1,6 @@
 package database;
 
+import exceptions.InputException;
 import model.*;
 
 import java.io.InputStream;
@@ -20,6 +21,7 @@ public class DataBaseHandler {
     public ArrayList<Vehicle> vehicles = new ArrayList<>();
     public ArrayList<Return> returns = new ArrayList<>();
     public ArrayList<Reservation> reservations = new ArrayList<>();
+    int currConf = 9999;
 
 
 
@@ -169,6 +171,14 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(reservations);
+        int curr = -1;
+        for (Reservation r: reservations) {
+            if (r.getConfNo() > curr) {
+                curr = r.getConfNo();
+            }
+        }
+        currConf = curr + 1;
+
         return reservations;
     }
 
@@ -232,10 +242,10 @@ public class DataBaseHandler {
         getReturns();
         getVehicleTypes();
         getVehicles();
-        searchCars("Sedan", "Kits", "", "");
-        searchCars("", "UBC", "", "");
-        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
-        searchCars("Sedan", "UBC", "2019-05-02 05:10:00", "2019-04-05 05:10:00");
+//        searchCars("Sedan", "Kits", "", "");
+//        searchCars("", "UBC", "", "");
+//        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
+//        searchCars("Sedan", "UBC", "2019-05-02 05:10:00", "2019-04-05 05:10:00");
     }
 
 
@@ -307,7 +317,7 @@ public class DataBaseHandler {
         }
     }
 
-     public ArrayList<Vehicle> searchCars(String type,String location,String from,String to) {
+     public ArrayList<Vehicle> searchCars(String type,String location,String from,String to) throws InputException {
         ArrayList<Vehicle> result = new ArrayList<>();
          if (type.equals("")) {
              type = "%";
@@ -326,9 +336,7 @@ public class DataBaseHandler {
                  Timestamp startDate = Timestamp.valueOf(from);
                  Timestamp endDate = Timestamp.valueOf(to);
                  if (startDate.after(endDate)) {
-                     System.out.println("Improper dates!");
-                     //Todo SHOW GUI ERROR for improper dates.
-                     return new ArrayList<>();
+                     throw new InputException("Improper dates! Start after end");
                  }
                  ps = connection.prepareStatement("SELECT * FROM Vehicle v WHERE v.vtname LIKE ? AND " +
                          "v.location LIKE ? AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (" +
@@ -390,7 +398,7 @@ public class DataBaseHandler {
              System.out.println(e.getMessage());
          } catch (IllegalArgumentException e) {
              //TODO SHOW GUI error for improper date.
-             System.out.println(e.getMessage());
+             throw new InputException("Timestamp format must be yyyy-mm-dd hh:mm:ss[.fffffffff]");
          }
 
          return result;
@@ -403,6 +411,43 @@ public class DataBaseHandler {
          //                        OR R.fromDate > DATE(to))
          //GROUP BY V.type
          //ORDER BY COUNT(DISTINCT(vid)) ASC;
+    }
+
+
+    public Reservation makeReservation(String name,String license,String type,String location, String pdate,String ptime,String rdate,String rtime) throws InputException {
+        Timestamp start = Timestamp.valueOf(pdate + " " + ptime);
+        Timestamp end = Timestamp.valueOf(rdate + " " + rtime);
+        if (start.after(end)) {
+            throw new InputException("Invalid dates! Start is after end");
+        }
+        ArrayList<Vehicle> availableVehicles = searchCars(type, location, pdate + " " + ptime, rdate + " " + rtime);
+        if (availableVehicles.size() == 0) {
+            throw new InputException("No vehicles available at that time!");
+        }
+
+        Reservation r = new Reservation(currConf, license, type, start, end);
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Reservation VALUES (?,?,?,?,?)");
+            ps.setString(1, Integer.toString(r.getConfNo()));
+            ps.setString(2, r.getDlicense());
+            ps.setString(3, r.getVtname());
+            ps.setTimestamp(4, r.getFromDate());
+            ps.setTimestamp(5, r.getToDate());
+
+            ps.executeUpdate();
+            connection.commit();
+            ps.close();
+            getReservations();
+
+            return r;
+        } catch (SQLException e) {
+            System.out.println("SQL ERROR");
+            System.out.println(e.getMessage());
+            rollbackConnection();
+            throw new InputException("SQL error :(");
+        }
+
     }
 
     //TODO figure out return type
