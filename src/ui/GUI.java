@@ -2,6 +2,7 @@
 package ui;
 
 import database.DataBaseHandler;
+import exceptions.InputException;
 import model.Vehicle;
 
 import javax.swing.*;
@@ -170,14 +171,20 @@ public class GUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
-        jLabel1.setText("Needless Database Project!");
+        jLabel1.setText("Car Database Project!");
 
         SearchTo.setToolTipText("");
 
         SearchExecute.setText("Search");
         SearchExecute.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                SearchExecuteMouseClicked(evt);
+
+                try {
+                    SearchExecuteMouseClicked(evt);
+                } catch (InputException e) {
+                    ErrorTemplate er = new ErrorTemplate(e.getMessage());
+
+                }
             }
         });
 
@@ -846,7 +853,7 @@ public class GUI extends javax.swing.JFrame {
 
 
 
-    private void SearchExecuteMouseClicked(java.awt.event.MouseEvent evt) {
+    private void SearchExecuteMouseClicked(java.awt.event.MouseEvent evt) throws InputException {
         String type = SearchType.getText();
         String location = SearchLocation.getText();
         String from = SearchFrom.getText();
