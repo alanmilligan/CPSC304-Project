@@ -21,7 +21,8 @@ public class DataBaseHandler {
     public ArrayList<Vehicle> vehicles = new ArrayList<>();
     public ArrayList<Return> returns = new ArrayList<>();
     public ArrayList<Reservation> reservations = new ArrayList<>();
-    int currConf = 9999;
+    public int currConf = 9999;
+    public int currRent = 9999;
 
 
 
@@ -197,7 +198,13 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(rents);
-        System.out.println(rents.size());
+        int curr = -1;
+        for (Rent r: rents) {
+            if (r.getRid() > curr) {
+                curr = r.getRid();
+            }
+        }
+        currRent = curr + 1;
 
     }
 
@@ -235,6 +242,7 @@ public class DataBaseHandler {
 
         getCustomers();
         getRents();
+        System.out.println(rents.size());
         getReservations();
         getReturns();
         getVehicleTypes();
@@ -243,6 +251,13 @@ public class DataBaseHandler {
 //        searchCars("", "UBC", "", "");
 //        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
 //        searchCars("Sedan", "UBC", "2019-05-02 05:10:00", "2019-04-05 05:10:00");
+//        try {
+//            System.out.println(makeRentNoReservation("Kobe Bryant", "MAMBA25", "Truck",
+//                    "2020-02-02", "03:33:33", "2020-02-03", "03:33:33", "mamba", 1231231231, 32323, "UBC"));
+//            System.out.println(rents.size());
+//        } catch (InputException e) {
+//            System.out.println(e.getMessage());
+//        }
     }
 
 
@@ -319,7 +334,7 @@ public class DataBaseHandler {
          if (type.equals("")) {
              type = "%";
          } if (location.equals("")) {
-             location = "%";
+             location = "UBC";
          }
          try {
              PreparedStatement ps;
@@ -369,8 +384,7 @@ public class DataBaseHandler {
                  Timestamp endDate = Timestamp.valueOf(to);
                  if (startDate.after(endDate)) {
                      System.out.println("Improper dates!");
-                     //Todo SHOW GUI ERROR for improper dates.
-                     return new ArrayList<>();
+                     throw new InputException("Improper dates! Start after end");
                  }
                  p = connection.prepareStatement("SELECT COUNT(*) as total FROM Vehicle v WHERE v.vtname LIKE ? AND " +
                          "v.location LIKE ? AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (" +
@@ -394,7 +408,6 @@ public class DataBaseHandler {
          } catch (SQLException e) {
              System.out.println(e.getMessage());
          } catch (IllegalArgumentException e) {
-             //TODO SHOW GUI error for improper date.
              throw new InputException("Timestamp format must be yyyy-mm-dd hh:mm:ss[.fffffffff]");
          }
 
@@ -447,20 +460,112 @@ public class DataBaseHandler {
 
     }
 
-    //TODO figure out return type
-    public void verifyReservation() {
-        //Query to find there exists a car that is allowed with constraints
+    public Reservation findReservation(int confNumber) throws InputException {
+        Reservation r = null;
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Reservation WHERE confNo = " + Integer.toString(confNumber));
+            while(rs.next()) {
+                r = new Reservation(rs.getInt("confNo"), rs.getString("vtname"),
+                        rs.getString("dlicense"), rs.getTimestamp("fromDate"),
+                        rs.getTimestamp("toDate"));
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        if (r == null) {
+            throw new InputException("Reservation Number with given Confirmation Number not found!");
+        }
+
+        return r;
 
     }
 
-    //TODO figure out return type
-    public void findReservation() {
-        //SELECT *
-        //FROM Reservation R
-        //WHERE R.confNumber = ConfNumber
+    //Todo ADD cardName into GUI, also Card type is not needed
+    //Todo Add a GUI field to specify the location when renting a car with reservation because the project spec is stupid
+    public Rent makeRent(Reservation r, String cardName, int cardNo, int expDate, String location) throws InputException {
+        ArrayList<Vehicle> cars = searchCars(r.getVtname(), location, r.getFromDate().toString(), r.getToDate().toString());
+        if (cars.size() == 0) {
+            throw new InputException("Car type specified for your reservation is no longer available");
+        }else {
+            Rent rent = new Rent(currRent, cars.get(0).getVlicense(), r.getDlicense(), r.getFromDate(), r.getToDate(),
+                    cars.get(0).getOdometer(),cardName, cardNo, expDate, r.getConfNo());
+            try {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Rent VALUES (?,?,?,?,?,?,?,?,?,?)");
+                ps.setInt(1, rent.getRid());
+                ps.setString(2, rent.getVlicense());
+                ps.setString(3, rent.getDlicense());
+                ps.setTimestamp(4, rent.getFromDate());
+                ps.setTimestamp(5, rent.getToDate());
+                ps.setInt(6, rent.getOdometer());
+                ps.setString(7, rent.getCardName());
+                ps.setInt(8, rent.getCardNo());
+                ps.setInt(9, rent.getExpDate());
+                ps.setInt(10, rent.getConfNo());
+
+                ps.executeUpdate();
+                connection.commit();
+                ps.close();
+                getRents();
+                return rent;
+            } catch (SQLException e) {
+                System.out.println("SQL ERROR");
+                System.out.println(e.getMessage());
+                rollbackConnection();
+                throw new InputException("SQL error :(");
+            }
+        }
     }
 
+    public Rent makeRentNoReservation(String name, String dlicense, String type, String pdate, String ptime, String rdate, String rtime, String cardName, int cardNo, int expDate, String location) throws InputException {
+        boolean customerFound = false;
+        for (Customer c: customers) {
+            if (c.getDlicense().equals(dlicense)) {
+                customerFound = true;
+            }
+        }
+        if (!customerFound) {
+            throw new InputException("No Customer with specified license found. Please register customer in the Customer tab!");
+        }
 
+        Timestamp start = Timestamp.valueOf(pdate + " " + ptime);
+        Timestamp end = Timestamp.valueOf(rdate + " " + rtime);
+        if (start.after(end)) {
+            throw new InputException("Invalid dates! Start is after end");
+        }
+        ArrayList<Vehicle> availableVehicles = searchCars(type, location, pdate + " " + ptime, rdate + " " + rtime);
+        if (availableVehicles.size() == 0) {
+            throw new InputException("No vehicles available at that time!");
+        }
+        Rent rent = new Rent(currRent, availableVehicles.get(0).getVlicense(), dlicense, start, end,
+                availableVehicles.get(0).getOdometer(),cardName, cardNo, expDate, null);
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Rent VALUES (?,?,?,?,?,?,?,?,?,?)");
+            ps.setInt(1, rent.getRid());
+            ps.setString(2, rent.getVlicense());
+            ps.setString(3, rent.getDlicense());
+            ps.setTimestamp(4, rent.getFromDate());
+            ps.setTimestamp(5, rent.getToDate());
+            ps.setInt(6, rent.getOdometer());
+            ps.setString(7, rent.getCardName());
+            ps.setInt(8, rent.getCardNo());
+            ps.setInt(9, rent.getExpDate());
+            ps.setNull(10,java.sql.Types.INTEGER);
 
+            ps.executeUpdate();
+            connection.commit();
+            ps.close();
+            getRents();
+            return rent;
+        } catch (SQLException e) {
+            System.out.println("SQL ERROR");
+            System.out.println(e.getMessage());
+            rollbackConnection();
+            throw new InputException("SQL error :(");
+        }
+    }
 
 }

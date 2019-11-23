@@ -13,9 +13,9 @@ public class Rent {
     private String CardName;
     private int cardNo;
     private int expDate;
-    private int confNo;
+    private Integer confNo;
 
-    public Rent(int rid, String vlicense, String dlicense, Timestamp fromDate, Timestamp toDate, int odometer, String cardName, int cardNo, int expDate, int confNo) {
+    public Rent(int rid, String vlicense, String dlicense, Timestamp fromDate, Timestamp toDate, int odometer, String cardName, int cardNo, int expDate, Integer confNo) {
         this.rid = rid;
         this.vlicense = vlicense;
         this.dlicense = dlicense;
@@ -80,7 +80,7 @@ public class Rent {
         return expDate;
     }
 
-    public int getConfNo() {
+    public Integer getConfNo() {
         return confNo;
     }
 }
