@@ -737,12 +737,19 @@ public class GUI extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(TableTable);
 
-        TableDropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        // TODO add tables here
+        TableDropdown.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Customer", "Rent", "Reservation", "Return", "Vehicle", "VehicleType" }));
+        TableDropdown.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TableDropdownActionPerformed(evt);
+            }
+        });
 
         jLabel20.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
         jLabel20.setText("Table:");
 
-        jLabel21.setText("Format: (val1,val2,...,valn)");
+        // TODO add instructions for deletion and update here
+        jLabel21.setText("Insert Customer: (cellphone, name, address, dlicense) | Delete Return: (rid)");
 
         TupleEntry.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
