@@ -166,7 +166,7 @@ public class Rental extends javax.swing.JFrame {
 
         jLabel21.setText("Credit Card Expiry [MMYY]");
 
-        jLabel22.setText("Card Type");
+        jLabel22.setText("Card Name");
 
         ConfirmRentalButton.setText("Confirm Rental");
         ConfirmRentalButton.addActionListener(new java.awt.event.ActionListener() {
@@ -312,7 +312,6 @@ public class Rental extends javax.swing.JFrame {
         this.cardType = RentalCreditCard.getText();
 
         database.makeRentNoReservation(name, dlicense, type, pdate, ptime, rdate, rtime, cardType, Integer.parseInt(this.cardNo), Integer.parseInt(this.cardExp), loc);
-
         this.dispose();
     }
 

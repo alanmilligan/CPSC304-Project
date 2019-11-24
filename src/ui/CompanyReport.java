@@ -1,7 +1,16 @@
 
 package ui;
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
 
+/**
+ *
+ * @author alansmacbook
+ */
 public class CompanyReport extends javax.swing.JFrame {
 
     /**
@@ -29,6 +38,7 @@ public class CompanyReport extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         LocationCountTable = new javax.swing.JTable();
         TotalTransactions = new javax.swing.JLabel();
+        TotalRevenue = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -37,17 +47,17 @@ public class CompanyReport extends javax.swing.JFrame {
 
         DetailsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
-                        {null, null, null, null, null, null, null, null, null},
-                        {null, null, null, null, null, null, null, null, null},
-                        {null, null, null, null, null, null, null, null, null},
-                        {null, null, null, null, null, null, null, null, null}
+                        {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                        {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                        {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                        {null, null, null, null, null, null, null, null, null, null, null, null, null}
                 },
                 new String [] {
-                        "RID", "License Plate", "Drivers Licence", "From", "To", "Odometer", "Card #", "Expiration", "Conf. Number"
+                        "RID", "License Plate", "V. Type", "Drivers Licence", "From", "To", "Odometer", "Card #", "Card Name", "Expiration", "Location", "City", "Conf. Number"
                 }
         ) {
             boolean[] canEdit = new boolean [] {
-                    true, false, false, false, true, false, false, false, false
+                    false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -65,6 +75,10 @@ public class CompanyReport extends javax.swing.JFrame {
             DetailsTable.getColumnModel().getColumn(6).setResizable(false);
             DetailsTable.getColumnModel().getColumn(7).setResizable(false);
             DetailsTable.getColumnModel().getColumn(8).setResizable(false);
+            DetailsTable.getColumnModel().getColumn(9).setResizable(false);
+            DetailsTable.getColumnModel().getColumn(10).setResizable(false);
+            DetailsTable.getColumnModel().getColumn(11).setResizable(false);
+            DetailsTable.getColumnModel().getColumn(12).setResizable(false);
         }
 
         CloseReport.setText("Close");
@@ -76,39 +90,13 @@ public class CompanyReport extends javax.swing.JFrame {
 
         TypeCountTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
-                        {null, null},
-                        {null, null},
-                        {null, null},
-                        {null, null}
-                },
-                new String [] {
-                        "Vehicle Type", "Count"
-                }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                    false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane2.setViewportView(TypeCountTable);
-        if (TypeCountTable.getColumnModel().getColumnCount() > 0) {
-            TypeCountTable.getColumnModel().getColumn(0).setHeaderValue("Vehicle Type");
-            TypeCountTable.getColumnModel().getColumn(1).setResizable(false);
-            TypeCountTable.getColumnModel().getColumn(1).setHeaderValue("Count");
-        }
-
-        LocationCountTable.setModel(new javax.swing.table.DefaultTableModel(
-                new Object [][] {
                         {null, null, null},
                         {null, null, null},
                         {null, null, null},
                         {null, null, null}
                 },
                 new String [] {
-                        "Location", "City", "Count"
+                        "Vehicle Type", "Count", "Revenue"
                 }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -119,42 +107,73 @@ public class CompanyReport extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jScrollPane2.setViewportView(TypeCountTable);
+        if (TypeCountTable.getColumnModel().getColumnCount() > 0) {
+            TypeCountTable.getColumnModel().getColumn(0).setResizable(false);
+            TypeCountTable.getColumnModel().getColumn(1).setResizable(false);
+            TypeCountTable.getColumnModel().getColumn(2).setResizable(false);
+        }
+
+        LocationCountTable.setModel(new javax.swing.table.DefaultTableModel(
+                new Object [][] {
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String [] {
+                        "Location", "City", "Count", "Revenue"
+                }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                    false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane3.setViewportView(LocationCountTable);
         if (LocationCountTable.getColumnModel().getColumnCount() > 0) {
             LocationCountTable.getColumnModel().getColumn(0).setResizable(false);
-            LocationCountTable.getColumnModel().getColumn(0).setHeaderValue("Location");
-            LocationCountTable.getColumnModel().getColumn(1).setHeaderValue("City");
+            LocationCountTable.getColumnModel().getColumn(1).setResizable(false);
             LocationCountTable.getColumnModel().getColumn(2).setResizable(false);
-            LocationCountTable.getColumnModel().getColumn(2).setHeaderValue("Count");
+            LocationCountTable.getColumnModel().getColumn(3).setResizable(false);
         }
 
         TotalTransactions.setText("Total <TYPE>: <NUMBER>");
+
+        TotalRevenue.setText("<TOTAL REVENUE>");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addGroup(layout.createSequentialGroup()
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addGap(0, 0, Short.MAX_VALUE)
+                                                .addComponent(ReportLabel)
+                                                .addGap(322, 322, 322))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addComponent(jScrollPane1)
                                                         .addGroup(layout.createSequentialGroup()
-                                                                .addContainerGap()
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 366, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addGroup(layout.createSequentialGroup()
-                                                                .addGap(230, 230, 230)
+                                                                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
                                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                                         .addComponent(TotalTransactions)
-                                                                        .addComponent(ReportLabel))))
-                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())
+                                                                        .addComponent(TotalRevenue))
+                                                                .addGap(24, 24, 24)))
+                                                .addContainerGap())))
                         .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(CloseReport)
-                                .addGap(268, 268, 268))
+                                .addGap(354, 354, 354))
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,14 +181,19 @@ public class CompanyReport extends javax.swing.JFrame {
                                 .addContainerGap()
                                 .addComponent(ReportLabel)
                                 .addGap(18, 18, 18)
-                                .addComponent(TotalTransactions)
-                                .addGap(23, 23, 23)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
-                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                                                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(65, 65, 65)
+                                                .addComponent(TotalTransactions)
+                                                .addGap(28, 28, 28)
+                                                .addComponent(TotalRevenue)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(CloseReport)
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -180,13 +204,14 @@ public class CompanyReport extends javax.swing.JFrame {
     private void CloseReportActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
     }
-    
+
 
     // Variables declaration - do not modify
     private javax.swing.JButton CloseReport;
     private javax.swing.JTable DetailsTable;
     private javax.swing.JTable LocationCountTable;
     private javax.swing.JLabel ReportLabel;
+    private javax.swing.JLabel TotalRevenue;
     private javax.swing.JLabel TotalTransactions;
     private javax.swing.JTable TypeCountTable;
     private javax.swing.JScrollPane jScrollPane1;
