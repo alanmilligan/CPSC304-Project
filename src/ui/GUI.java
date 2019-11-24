@@ -1157,6 +1157,11 @@ public class GUI extends javax.swing.JFrame {
             String rtime = NewRentalRTime.getText();
             String rid = String.valueOf(database.currRent);
 
+            if (name.equals("") || license.equals("") || type.equals("") || location.equals("") || pdate.equals("")
+                    || ptime.equals("") || rdate.equals("") || rtime.equals("") || rid.equals("")) {
+                throw new InputException("Fields must be filled!");
+            }
+
             r = new Rental(database, name, license, type, location, pdate, ptime, rdate, rtime, rid);
             //r = new Rental(database);
 

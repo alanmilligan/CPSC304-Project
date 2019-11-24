@@ -191,7 +191,7 @@ public class Rental extends javax.swing.JFrame {
                     ConfirmRentalButtonActionPerformed(evt);
                 } catch (InputException e) {
                     try {
-                        throw new InputException("Confirmation unsuccessful, please try again!");
+                        throw new InputException(e.getMessage());
                     } catch (InputException ex) {
                         ErrorTemplate et = new ErrorTemplate(ex.getMessage());
                     }
