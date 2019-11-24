@@ -3,7 +3,7 @@ package database;
 import exceptions.InputException;
 import model.*;
 
-import java.io.InputStream;
+import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -240,6 +240,7 @@ public class DataBaseHandler {
 //        File initialData = new File("src/database/init.sql");
 //        try {
 //            InputStream stream = new DataInputStream(new FileInputStream(initialData));
+//
 //            executeScript(stream);
 //        } catch (FileNotFoundException e) {
 //            System.out.println("File not found");
@@ -254,6 +255,7 @@ public class DataBaseHandler {
         getReturns();
         getVehicleTypes();
         getVehicles();
+
 //        searchCars("Sedan", "Kits", "", "");
 //        searchCars("", "UBC", "", "");
 //        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
@@ -464,7 +466,6 @@ public class DataBaseHandler {
             rollbackConnection();
             throw new InputException("SQL error :(");
         }
-
     }
 
     public Reservation findReservation(int confNumber) throws InputException {
