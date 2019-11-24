@@ -712,12 +712,13 @@ public class DataBaseHandler {
             throw new InputException("Vehicle for this rental already returned!");
         }
 
-        String calc = Integer.toString(kmrate) + " * " + String.valueOf(odometerDiff) + String.valueOf(gas ? 100 : 0)
-                +" = " + String.valueOf(kmrate*odometer+(gas ? 100 : 0));
+        String calc = Integer.toString(kmrate) + " * " + String.valueOf(odometerDiff) + " + " + String.valueOf(gas ? 0 : 100)
+                +" = " + String.valueOf(kmrate*odometerDiff+(gas ? 0 : 100));
+        System.out.println(odometerDiff);
 
 
         String[] returnInfo = new String[] {Integer.toString(r.getRid()),r.getFromDate().toString(),vt.getVtname(),
-                Integer.toString(kmrate),String.valueOf(odometerDiff),String.valueOf(gas ? 100 : 0),calc,String.valueOf(value)};
+                Integer.toString(kmrate),String.valueOf(odometerDiff),String.valueOf(gas ? 0 : 100),calc,String.valueOf(value)};
 
 //        String costExplanation = "Vehicle Type " + vt.getVtname() + " kmRate = " + kmrate + " \n Odometer Difference = " +
 //                "" + odometerDiff + "\n KmRate cost = " + odometerDiff + " * " + kmrate + " = " + Integer.toString(odometerDiff * kmrate);
