@@ -144,7 +144,7 @@ public class GUI extends javax.swing.JFrame {
         ReturnReportCity = new javax.swing.JTextField();
         jLabel46 = new javax.swing.JLabel();
         jLabel47 = new javax.swing.JLabel();
-        ClerkRentalConfirmation1 = new javax.swing.JTextField();
+        ClerkRentalLocation = new javax.swing.JTextField();
         TablePanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         TableTable = new javax.swing.JTable();
@@ -573,46 +573,49 @@ public class GUI extends javax.swing.JFrame {
                                                                         .addGroup(ClerkPanelLayout.createSequentialGroup()
                                                                                 .addComponent(jLabel47)
                                                                                 .addGap(18, 18, 18)
-                                                                                .addComponent(ClerkRentalConfirmation1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                                                .addComponent(ClerkRentalLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                                         .addGroup(ClerkPanelLayout.createSequentialGroup()
                                                                 .addGap(95, 95, 95)
                                                                 .addComponent(jLabel24))
                                                         .addGroup(ClerkPanelLayout.createSequentialGroup()
                                                                 .addGap(68, 68, 68)
                                                                 .addComponent(FindReservationButton))
-                                                        .addGroup(ClerkPanelLayout.createSequentialGroup()
-                                                                .addGap(75, 75, 75)
-                                                                .addComponent(RequestRental, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                .addGroup(ClerkPanelLayout.createSequentialGroup()
+                                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ClerkPanelLayout.createSequentialGroup()
+                                                                .addContainerGap()
+                                                                .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                        .addGroup(ClerkPanelLayout.createSequentialGroup()
+                                                                                .addGap(75, 75, 75)
+                                                                                .addComponent(RequestRental, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                         .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                                .addComponent(jLabel35)
-                                                                                .addComponent(jLabel34)
-                                                                                .addComponent(jLabel33)
-                                                                                .addComponent(jLabel36))
-                                                                        .addGap(18, 18, 18)
-                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                                .addComponent(NewRentalType, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addComponent(NewRentalLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addComponent(NewRentalPDate, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addComponent(NewRentalPTime, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                                                .addGroup(ClerkPanelLayout.createSequentialGroup()
-                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                                .addComponent(jLabel32)
-                                                                                .addComponent(jLabel31))
-                                                                        .addGap(18, 18, 18)
-                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                                                .addComponent(NewRentalRDate, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                                .addComponent(NewRentalRTime, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                                                .addGroup(ClerkPanelLayout.createSequentialGroup()
-                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                                .addComponent(jLabel38)
-                                                                                .addComponent(jLabel37))
-                                                                        .addGap(18, 18, 18)
-                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                                                .addComponent(NewRentalName)
-                                                                                .addComponent(NewRentalLicence, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                                        .addComponent(jLabel17))
+                                                                                .addGroup(ClerkPanelLayout.createSequentialGroup()
+                                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                                                .addComponent(jLabel35)
+                                                                                                .addComponent(jLabel34)
+                                                                                                .addComponent(jLabel33)
+                                                                                                .addComponent(jLabel36))
+                                                                                        .addGap(18, 18, 18)
+                                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                                .addComponent(NewRentalType, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                .addComponent(NewRentalLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                .addComponent(NewRentalPDate, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                .addComponent(NewRentalPTime, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                                                .addGroup(ClerkPanelLayout.createSequentialGroup()
+                                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                                                .addComponent(jLabel32)
+                                                                                                .addComponent(jLabel31))
+                                                                                        .addGap(18, 18, 18)
+                                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                                                                .addComponent(NewRentalRDate, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                                                .addComponent(NewRentalRTime, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                                                .addGroup(ClerkPanelLayout.createSequentialGroup()
+                                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                                                .addComponent(jLabel38)
+                                                                                                .addComponent(jLabel37))
+                                                                                        .addGap(18, 18, 18)
+                                                                                        .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                                                                                .addComponent(NewRentalName)
+                                                                                                .addComponent(NewRentalLicence, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                                        .addComponent(jLabel17))))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
                                                 .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                         .addComponent(jLabel27, javax.swing.GroupLayout.Alignment.TRAILING)
@@ -698,7 +701,7 @@ public class GUI extends javax.swing.JFrame {
                                                         .addComponent(jLabel30))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(ClerkRentalConfirmation1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(ClerkRentalLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(jLabel47))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(FindReservationButton)
@@ -765,7 +768,6 @@ public class GUI extends javax.swing.JFrame {
                                                         .addComponent(ReturnReportCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addGap(163, 163, 163))))
         );
-
         TabbedPane.addTab("Clerk", ClerkPanel);
 
         TableTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -1185,7 +1187,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel CarsFoundLable;
     private javax.swing.JPanel ClerkPanel;
     private javax.swing.JTextField ClerkRentalConfirmation;
-    private javax.swing.JTextField ClerkRentalConfirmation1;
+    private javax.swing.JTextField ClerkRentalLocation;
     private javax.swing.JButton CompanyRentalReport;
     private javax.swing.JButton CompanyReturnReport;
     private javax.swing.JPanel CustomerPanel;
