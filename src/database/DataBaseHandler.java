@@ -3,9 +3,10 @@ package database;
 import exceptions.InputException;
 import model.*;
 
-import java.io.*;
+import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -265,14 +266,14 @@ public class DataBaseHandler {
 //        } catch (InputException e) {
 //            e.printStackTrace();
 //        }
-        try {
-            System.out.println(handleReturnReport("2017-02-01", "", ""));
-            System.out.println(handleReturnReportCountVtype("2017-02-01", "", ""));
-            System.out.println(handleReturnReportCountBranch("2017-02-01", "", ""));
-            System.out.println(handleReturnReportCountBranch("2017-02-01", "UBC", "Vancouver"));
-        } catch (InputException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            System.out.println(handleReturnReport("2017-02-01", "", ""));
+//            System.out.println(handleReturnReportCountVtype("2017-02-01", "", ""));
+//            System.out.println(handleReturnReportCountBranch("2017-02-01", "", ""));
+//            System.out.println(handleReturnReportCountBranch("2017-02-01", "UBC", "Vancouver"));
+//        } catch (InputException e) {
+//            e.printStackTrace();
+//        }
     }
 
 
@@ -594,12 +595,23 @@ public class DataBaseHandler {
 
 
     public String[] handleReturn(int rentid, String date, int odometer, boolean gas) throws InputException {
-        getRents();
         Rent r = null;
-        for (Rent rent: rents) {
-            if (rent.getRid() == rentid) {
-                r = rent;
+        try {
+            PreparedStatement psRent = connection.prepareStatement("SELECT * FROM Rent WHERE rid = ?");
+            psRent.setInt(1, rentid);
+            ResultSet rs = psRent.executeQuery();
+            connection.commit();
+            while (rs.next()) {
+                r = new Rent(rs.getInt("rid"), rs.getString("vlicense"),
+                        rs.getString("dlicense"), rs.getTimestamp("fromDate"),
+                        rs.getTimestamp("toDate"), rs.getInt("odometer"),
+                        rs.getString("cardName"), rs.getInt("cardNo"),
+                        rs.getInt("ExpDate"), rs.getInt("confNo"));
             }
+            rs.close();
+            rs.close();
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
         }
         if (r == null) {
             throw new InputException("No matching rent ID!");
@@ -611,24 +623,44 @@ public class DataBaseHandler {
         }
 
         // Get car.
-        getVehicles();
         Vehicle v = null;
-        for (Vehicle veh: vehicles) {
-            if (veh.getVlicense().equals(r.getVlicense())) {
-                v = veh;
+        try {
+            PreparedStatement psVeh = connection.prepareStatement("SELECT * FROM Vehicle WHERE vlicense = ?");
+            psVeh.setString(1, r.getVlicense());
+            ResultSet rs = psVeh.executeQuery();
+            connection.commit();
+            while(rs.next()) {
+                v = new Vehicle(rs.getString("vlicense"), rs.getString("make"),
+                        rs.getString("model"), rs.getInt("year"), rs.getString("color"),
+                        rs.getInt("odometer"), rs.getString("status"), rs.getString("vtname"),
+                        rs.getString("location"), rs.getString("city"));
             }
+            rs.close();
+            psVeh.close();
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
         }
         if (v == null) {
             throw new InputException("No matching vehicle rented out!");
         }
 
         // Get vehicleType.
-        getVehicleTypes();
         VehicleType vt = null;
-        for (VehicleType vtype: vehicleTypes) {
-            if (vtype.getVtname().equals(v.getVtname())) {
-                vt = vtype;
+        try {
+            PreparedStatement psVeh = connection.prepareStatement("SELECT * FROM VehicleType WHERE vtname = ?");
+            psVeh.setString(1, v.getVtname());
+            ResultSet rs = psVeh.executeQuery();
+            connection.commit();
+            while(rs.next()) {
+                vt = new VehicleType(rs.getString("vtname"), rs.getString("features"),
+                        rs.getInt("wrate"), rs.getInt("drate"), rs.getInt("hrate"),
+                        rs.getInt("wirate"), rs.getInt("dirate"), rs.getInt("hirate"),
+                        rs.getInt("krate"));
             }
+            rs.close();
+            psVeh.close();
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
         }
         if (vt == null) {
             throw new InputException("No matching vehicle type!");
@@ -647,12 +679,6 @@ public class DataBaseHandler {
 
         String fulltank = gas ? "Y" : "N";
 
-        getReturns();
-        for (Return ret: returns) {
-            if (ret.getRid() == r.getRid()) {
-                throw new InputException("Vehicle for this rental already returned!");
-            }
-        }
 
         // Insert return value, update car.
         try {
@@ -675,8 +701,9 @@ public class DataBaseHandler {
             p.close();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            throw new InputException("SQL Error :(");
+            throw new InputException("Vehicle for this rental already returned!");
         }
+
 
         String costExplanation = "Vehicle Type " + vt.getVtname() + " kmRate = " + kmrate + " \n Odometer Difference = " +
                 "" + odometerDiff + "\n KmRate cost = " + odometerDiff + " * " + kmrate + " = " + Integer.toString(odometerDiff * kmrate);
@@ -685,9 +712,10 @@ public class DataBaseHandler {
                     "Final cost = " + value;
         }
 
-        return new String[] {Integer.toString(r.getRid()), r.getFromDate().toString(), rdate.toString(),
+        String[] answer = new String[] {Integer.toString(r.getRid()), r.getFromDate().toString(), rdate.toString(),
                 Integer.toString(value), costExplanation};
-
+        System.out.println(Arrays.toString(answer));
+        return answer;
     }
 
     // Getting Rent Reports (part 1 of 2)
