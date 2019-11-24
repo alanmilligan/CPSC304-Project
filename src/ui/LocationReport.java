@@ -119,17 +119,17 @@ public class LocationReport extends javax.swing.JFrame {
 
         TypeCountTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object [][] {
-                        {null, null},
-                        {null, null},
-                        {null, null},
-                        {null, null}
+                        {null, null, null},
+                        {null, null, null},
+                        {null, null, null},
+                        {null, null, null}
                 },
                 new String [] {
-                        "Vehicle Type", "Count"
+                        "Vehicle Type", "Count", "Revenue"
                 }
         ) {
             boolean[] canEdit = new boolean [] {
-                    false, false
+                    false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -137,6 +137,11 @@ public class LocationReport extends javax.swing.JFrame {
             }
         });
         jScrollPane2.setViewportView(TypeCountTable);
+        if (TypeCountTable.getColumnModel().getColumnCount() > 0) {
+            TypeCountTable.getColumnModel().getColumn(0).setResizable(false);
+            TypeCountTable.getColumnModel().getColumn(1).setResizable(false);
+            TypeCountTable.getColumnModel().getColumn(2).setResizable(false);
+        }
 
         CloseReport.setText("Close");
         CloseReport.addActionListener(new java.awt.event.ActionListener() {
@@ -217,6 +222,7 @@ public class LocationReport extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>
+
 
     private void CloseReportActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
