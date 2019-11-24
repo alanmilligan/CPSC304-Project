@@ -6,7 +6,6 @@ import model.*;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -594,6 +593,15 @@ public class DataBaseHandler {
     }
 
 
+
+
+
+
+
+
+
+
+
     public String[] handleReturn(int rentid, String date, int odometer, boolean gas) throws InputException {
         Rent r = null;
         try {
@@ -704,19 +712,39 @@ public class DataBaseHandler {
             throw new InputException("Vehicle for this rental already returned!");
         }
 
+        String calc = Integer.toString(kmrate) + " * " + String.valueOf(odometerDiff) + String.valueOf(gas ? 100 : 0)
+                +" = " + String.valueOf(kmrate*odometer+(gas ? 100 : 0));
 
-        String costExplanation = "Vehicle Type " + vt.getVtname() + " kmRate = " + kmrate + " \n Odometer Difference = " +
-                "" + odometerDiff + "\n KmRate cost = " + odometerDiff + " * " + kmrate + " = " + Integer.toString(odometerDiff * kmrate);
-        if (!gas) {
-            costExplanation = costExplanation + "\n Tank not returned full, added $100 extra cost \n " +
-                    "Final cost = " + value;
-        }
 
-        String[] answer = new String[] {Integer.toString(r.getRid()), r.getFromDate().toString(), rdate.toString(),
-                Integer.toString(value), costExplanation};
-        System.out.println(Arrays.toString(answer));
-        return answer;
+        String[] returnInfo = new String[] {Integer.toString(r.getRid()),r.getFromDate().toString(),vt.getVtname(),
+                Integer.toString(kmrate),String.valueOf(odometerDiff),String.valueOf(gas ? 100 : 0),calc,String.valueOf(value)};
+
+//        String costExplanation = "Vehicle Type " + vt.getVtname() + " kmRate = " + kmrate + " \n Odometer Difference = " +
+//                "" + odometerDiff + "\n KmRate cost = " + odometerDiff + " * " + kmrate + " = " + Integer.toString(odometerDiff * kmrate);
+//        if (!gas) {
+//            costExplanation = costExplanation + "\n Tank not returned full, added $100 extra cost \n " +
+//                    "Final cost = " + value;
+//        }
+//
+//        String[] answer = new String[] {Integer.toString(r.getRid()), r.getFromDate().toString(), rdate.toString(),
+//                Integer.toString(value), costExplanation};
+//        System.out.println(Arrays.toString(answer));
+        return returnInfo;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // Getting Rent Reports (part 1 of 2)
     public ArrayList<RentReport> handleRentReport(String date, String location, String city) throws InputException {
