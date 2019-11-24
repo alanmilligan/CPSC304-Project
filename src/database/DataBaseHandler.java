@@ -268,6 +268,8 @@ public class DataBaseHandler {
         try {
             System.out.println(handleReturnReport("2017-02-01", "", ""));
             System.out.println(handleReturnReportCountVtype("2017-02-01", "", ""));
+            System.out.println(handleReturnReportCountBranch("2017-02-01", "", ""));
+            System.out.println(handleReturnReportCountBranch("2017-02-01", "UBC", "Vancouver"));
         } catch (InputException e) {
             e.printStackTrace();
         }
@@ -887,6 +889,50 @@ public class DataBaseHandler {
                 count.add(String.valueOf(rs.getInt("num")));
                 count.add(String.valueOf(rs.getInt("revenue")));
                 count.add(rs.getString("vtname"));
+                counts.add(count);
+            }
+
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
+        } catch (IllegalArgumentException e) {
+            throw new InputException("Please input a date in right format!");
+        }
+        return counts;
+    }
+
+    // Getting Return Reports (part 3 of 3) Gets counts/revenue by branch
+    // Returns Arraylist or arraylists which contain (numReturns, Revenue, Location, City)
+    public ArrayList<ArrayList<String>> handleReturnReportCountBranch(String date, String location, String city) throws InputException {
+        ArrayList<ArrayList<String>> counts = new ArrayList<>();
+        try {
+            String start = date + " 00:00:00";
+            String end = date + " 23:59:59";
+            PreparedStatement ps;
+            if (location.equals("") && city.equals("")) {
+                ps = connection.prepareStatement("SELECT COUNT(ret.rid) AS num, SUM(value) AS  revenue,  " +
+                        "v.location as location, v.city as city FROM Rent r, Vehicle v, Return ret WHERE ret.rid = r.rid " +
+                        "AND ? <= rdate AND ? >= rdate AND v.vlicense = r.vlicense GROUP BY v.city, v.location");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                ps = connection.prepareStatement("SELECT COUNT(ret.rid) AS num, SUM(value) AS  revenue,  " +
+                        "v.location as location, v.city as city FROM Rent r, Vehicle v, Return ret WHERE ret.rid = r.rid " +
+                        "AND ? <= rdate AND ? >= rdate AND v.vlicense = r.vlicense AND v.location = ? AND v.city = ? " +
+                        "GROUP BY v.city, v.location");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+                ps.setString(3, location);
+                ps.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ArrayList<String> count = new ArrayList<>();
+                count.add(String.valueOf(rs.getInt("num")));
+                count.add(String.valueOf(rs.getInt("revenue")));
+                count.add(rs.getString("location"));
+                count.add(rs.getString("city"));
                 counts.add(count);
             }
 
