@@ -2,6 +2,7 @@
 package ui;
 
 import database.DataBaseHandler;
+import exceptions.InputException;
 import model.*;
 
 import javax.swing.*;
@@ -1133,7 +1134,10 @@ public class GUI extends javax.swing.JFrame {
         if (r != null) {r.dispose();}
         try {
             String confNo = ClerkRentalConfirmation.getText();
-            database.findReservation(Integer.valueOf(confNo));
+            model.Reservation r = database.findReservation(Integer.parseInt(confNo));
+            String loc = ClerkRentalLocation.getText();
+            if (loc.isEmpty()) {throw new InputException("Please enter a location");}
+            Rental rent = new Rental(database, confNo, loc);
         } catch (Exception e) {
             ErrorTemplate er = new ErrorTemplate(e.getMessage());
         }
