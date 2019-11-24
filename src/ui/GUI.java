@@ -988,7 +988,15 @@ public class GUI extends javax.swing.JFrame {
     }
 
     private void LocationRentalReportActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        String location = RentalReportLocation.getText();
+        String city = RentalReportCity.getText();
+        String date = ReportDateInput.getText();
+        try {
+            LocationReport report = new LocationReport(database, date, location, city, false);
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+            System.out.println(e.getMessage());
+        }
     }
 
     private void CompanyReturnReportActionPerformed(String date) {
@@ -1001,7 +1009,15 @@ public class GUI extends javax.swing.JFrame {
     }
 
     private void LocationReturnReportActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        String location = ReturnReportLocation.getText();
+        String city = RentalReportCity.getText();
+        String date = ReportDateInput.getText();
+        try {
+            LocationReport report = new LocationReport(database, date, location, city, true);
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+            System.out.println(e.getMessage());
+        }
     }
 
     private void TupleEntryActionPerformed(java.awt.event.ActionEvent evt) {
