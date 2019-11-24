@@ -64,6 +64,12 @@ public class DataBaseHandler {
         connection = DriverManager.getConnection(ORACLE_URL, username, password);
         connection.setAutoCommit(false);
 
+        getCustomers();
+        getRents();
+        getReservations();
+        getReturns();
+        getVehicleTypes();
+        getVehicles();
         System.out.println("\nConnected to Oracle!");
         return true;
     }
@@ -238,7 +244,6 @@ public class DataBaseHandler {
     private void setup(){
         getCustomers();
         getRents();
-        System.out.println(rents.size());
         getReservations();
         getReturns();
         getVehicleTypes();
@@ -353,8 +358,9 @@ public class DataBaseHandler {
              PreparedStatement ps;
              if (from.equals("")) {
                  ps = connection.prepareStatement
-                         ("SELECT * FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
-                 System.out.println("SELECT * FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
+                         ("SELECT * FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ? " +
+                                 "ORDER BY location, city, vtname");
+                 //System.out.println("SELECT * FROM Vehicle WHERE status='Available' AND vtname LIKE ? AND location LIKE ?");
                  ps.setString(1, type);
                  ps.setString(2, location);
              } else {
@@ -365,8 +371,8 @@ public class DataBaseHandler {
                  }
                  ps = connection.prepareStatement("SELECT * FROM Vehicle v WHERE v.vtname LIKE ? AND " +
                          "v.location LIKE ? AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (" +
-                         "r.toDate > ?) AND (r.fromDate < ?))");
-                 System.out.println("SELECT * FROM Vehicle v WHERE v.vtname LIKE '?' AND v.location LIKE '?' AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (r.toDate > ?) AND (r.fromDate < ?))");
+                         "r.toDate > ?) AND (r.fromDate < ?)) ORDER BY location, city, vtname");
+                 //System.out.println("SELECT * FROM Vehicle v WHERE v.vtname LIKE '?' AND v.location LIKE '?' AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (r.toDate > ?) AND (r.fromDate < ?))");
                  ps.setString(1, type);
                  ps.setString(2, location);
                  ps.setTimestamp(3, startDate);
@@ -415,7 +421,7 @@ public class DataBaseHandler {
              p.close();
              System.out.println(count);
              if (count != result.size()) {
-                 System.out.println("WEIRd error with count");
+                 System.out.println("Weird error with count");
              }
 
          } catch (SQLException e) {

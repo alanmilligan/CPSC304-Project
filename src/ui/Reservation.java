@@ -231,14 +231,14 @@ public class Reservation extends javax.swing.JFrame {
 
         //add other exception cases here like the time period being wack, its like 8 marks on the rubric. just put custom messages
 
-        ResDLicense.setText(r.getDlicense());
+        ResDLicense.setText(r.getVtname());
         ResLocation.setText(location);
         ResName.setText(name);
         ResPDate.setText(r.getFromDate().toString());
         ResPTime.setText(r.getFromDate().toString());
         ResRDate.setText(r.getToDate().toString());
         ResRTime.setText(r.getToDate().toString());
-        ResType.setText(r.getVtname());
+        ResType.setText(r.getDlicense());
         ResRID.setText(Integer.toString(r.getConfNo())); // this may have to have a unique value so be careful
 
         ResCost.setText(String.valueOf(calculateCost()));
