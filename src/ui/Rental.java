@@ -14,6 +14,7 @@ package ui;
 
 import database.DataBaseHandler;
 import exceptions.InputException;
+import model.Reservation;
 
 public class Rental extends javax.swing.JFrame {
 
@@ -31,6 +32,7 @@ public class Rental extends javax.swing.JFrame {
     String cardNo;
     String cardExp;
     String cardType;
+    Reservation r;
 
 
     /**
@@ -53,27 +55,41 @@ public class Rental extends javax.swing.JFrame {
     }
 
     private void setValues() {
-        RDName.setText(name);
-        RDDLicense.setText(dlicense);
-        RDType.setText(type);
-        RDLocation.setText(loc);
-        RDPDATE.setText(pdate);
-        RDPTime.setText(ptime);
-        RDRDate.setText(rdate);
-        RDRTIME.setText(rtime);
-        RDRID.setText(rid);
+        RDName.setText(this.name);
+        RDDLicense.setText(this.dlicense);
+        RDType.setText(this.type);
+        RDLocation.setText(this.loc);
+        RDPDATE.setText(this.pdate);
+        RDPTime.setText(this.ptime);
+        RDRDate.setText(this.rdate);
+        RDRTIME.setText(this.rtime);
+        RDRID.setText(this.rid);
     }
 
-    public Rental(DataBaseHandler db, String confNo) {
+    public Rental(DataBaseHandler db, String confNo, String location) {
         database = db;
+        initComponents();
         try {
-
-            db.findReservation(Integer.valueOf(confNo));
-
-        } catch (Exception e) {
+            Reservation r = db.findReservation(Integer.valueOf(confNo));
+            this.r = r;
+            System.out.println(r);
+            this.name = "";
+            this.type = r.getVtname();
+            this.dlicense = r.getDlicense();
+            System.out.println(dlicense);
+            String[] pdatetime = String.valueOf(r.getFromDate()).split(" ");
+            this.pdate = pdatetime[0];
+            this.ptime = pdatetime[1];
+            String[] rdatetime = String.valueOf(r.getToDate()).split(" ");
+            this.rdate = rdatetime[0];
+            this.rtime = rdatetime[1];
+            this.loc = location;
+            this.rid = String.valueOf(db.currRent);
+            setValues();
+            jLabel2.setText("");
+        } catch (InputException e) {
             ErrorTemplate er = new ErrorTemplate("No Reservation Found!");
         }
-        initComponents();
         this.setVisible(true);
     }
 
@@ -177,7 +193,7 @@ public class Rental extends javax.swing.JFrame {
                     try {
                         throw new InputException("Confirmation unsuccessful, please try again!");
                     } catch (InputException ex) {
-                        System.out.println("error error");
+                        ErrorTemplate et = new ErrorTemplate(ex.getMessage());
                     }
                 }
             }
@@ -311,7 +327,8 @@ public class Rental extends javax.swing.JFrame {
         this.cardNo = CreditCardNumberIO.getText();
         this.cardType = RentalCreditCard.getText();
 
-        database.makeRentNoReservation(name, dlicense, type, pdate, ptime, rdate, rtime, cardType, Integer.parseInt(this.cardNo), Integer.parseInt(this.cardExp), loc);
+        if(jLabel2.getText().isEmpty()) {database.makeRent(r, cardType, Integer.parseInt(cardNo), Integer.parseInt(cardExp), loc);}
+        else {database.makeRentNoReservation(name, dlicense, type, pdate, ptime, rdate, rtime, cardType, Integer.parseInt(this.cardNo), Integer.parseInt(this.cardExp), loc);}
         this.dispose();
     }
 

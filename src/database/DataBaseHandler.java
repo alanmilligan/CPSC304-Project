@@ -499,7 +499,7 @@ public class DataBaseHandler {
     }
 
     //Todo ADD cardName into GUI, also Card type is not needed
-    //Todo Add a GUI field to specify the location when renting a car with reservation because the project spec is stupid
+    //Todo Add a GUI field to specify the location when renting a car with reservation
     public Rent makeRent(Reservation r, String cardName, int cardNo, int expDate, String location) throws InputException {
         ArrayList<Vehicle> cars = searchCars(r.getVtname(), location, r.getFromDate().toString(), r.getToDate().toString());
         if (cars.size() == 0) {
@@ -520,6 +520,9 @@ public class DataBaseHandler {
                 ps.setInt(9, rent.getExpDate());
                 ps.setInt(10, rent.getConfNo());
 
+                ps.executeUpdate();
+                ps.close();
+
                 PreparedStatement p = connection.prepareStatement("UPDATE Vehicle SET status = 'Rented' WHERE vlicense = ?");
                 p.setString(1, rent.getVlicense());
                 p.executeUpdate();
@@ -527,6 +530,7 @@ public class DataBaseHandler {
                 p.close();
                 getRents();
                 getVehicles();
+                System.out.println("rent made");
                 return rent;
             } catch (SQLException e) {
                 System.out.println("SQL ERROR");

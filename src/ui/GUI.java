@@ -2,6 +2,7 @@
 package ui;
 
 import database.DataBaseHandler;
+import exceptions.InputException;
 import model.*;
 
 import javax.swing.*;
@@ -142,7 +143,7 @@ public class GUI extends javax.swing.JFrame {
         ReturnReportCity = new javax.swing.JTextField();
         jLabel46 = new javax.swing.JLabel();
         jLabel47 = new javax.swing.JLabel();
-        ClerkRentalConfirmation1 = new javax.swing.JTextField();
+        ClerkRentalLocation = new javax.swing.JTextField();
         TablePanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         TableTable = new javax.swing.JTable();
@@ -571,7 +572,7 @@ public class GUI extends javax.swing.JFrame {
                                                                         .addGroup(ClerkPanelLayout.createSequentialGroup()
                                                                                 .addComponent(jLabel47)
                                                                                 .addGap(18, 18, 18)
-                                                                                .addComponent(ClerkRentalConfirmation1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                                                                .addComponent(ClerkRentalLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                                         .addGroup(ClerkPanelLayout.createSequentialGroup()
                                                                 .addGap(95, 95, 95)
                                                                 .addComponent(jLabel24))
@@ -696,7 +697,7 @@ public class GUI extends javax.swing.JFrame {
                                                         .addComponent(jLabel30))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(ClerkRentalConfirmation1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(ClerkRentalLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addComponent(jLabel47))
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addComponent(FindReservationButton)
@@ -1103,7 +1104,10 @@ public class GUI extends javax.swing.JFrame {
         if (r != null) {r.dispose();}
         try {
             String confNo = ClerkRentalConfirmation.getText();
-            database.findReservation(Integer.valueOf(confNo));
+            model.Reservation r = database.findReservation(Integer.parseInt(confNo));
+            String loc = ClerkRentalLocation.getText();
+            if (loc.isEmpty()) {throw new InputException("Please enter a location");}
+            Rental rent = new Rental(database, confNo, loc);
         } catch (Exception e) {
             ErrorTemplate er = new ErrorTemplate(e.getMessage());
         }
@@ -1184,7 +1188,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel CarsFoundLable;
     private javax.swing.JPanel ClerkPanel;
     private javax.swing.JTextField ClerkRentalConfirmation;
-    private javax.swing.JTextField ClerkRentalConfirmation1;
+    private javax.swing.JTextField ClerkRentalLocation;
     private javax.swing.JButton CompanyRentalReport;
     private javax.swing.JButton CompanyReturnReport;
     private javax.swing.JPanel CustomerPanel;
