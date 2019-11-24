@@ -48,7 +48,7 @@ public class DataBaseHandler {
             System.out.println(EXCEPTION_TAG + " " + e.getMessage());
         }
 
-        //setup();
+        setup();
     }
 
     //prompt oracle login
@@ -237,16 +237,16 @@ public class DataBaseHandler {
 
     //run sql scripts/populate database
     private void setup(){
-        File initialData = new File("src/database/init.sql");
-        try {
-            InputStream stream = new DataInputStream(new FileInputStream(initialData));
-
-            executeScript(stream);
-        } catch (FileNotFoundException e) {
-            System.out.println("File not found");
-        } catch (SQLException e) {
-            System.out.println("Error setting up database");
-        }
+//        File initialData = new File("src/database/init.sql");
+//        try {
+//            InputStream stream = new DataInputStream(new FileInputStream(initialData));
+//
+//            executeScript(stream);
+//        } catch (FileNotFoundException e) {
+//            System.out.println("File not found");
+//        } catch (SQLException e) {
+//            System.out.println("Error setting up database");
+//        }
 
         getCustomers();
         getRents();
