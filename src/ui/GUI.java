@@ -444,7 +444,7 @@ public class GUI extends javax.swing.JFrame {
         CompanyRentalReport.setText("Company Wide Rental Report");
         CompanyRentalReport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CompanyRentalReportActionPerformed(evt);
+                CompanyRentalReportActionPerformed(ReportDateInput.getText());
             }
         });
 
@@ -469,7 +469,7 @@ public class GUI extends javax.swing.JFrame {
         CompanyReturnReport.setText("Company Wide Return Report");
         CompanyReturnReport.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CompanyReturnReportActionPerformed(evt);
+                CompanyReturnReportActionPerformed(ReportDateInput.getText());
             }
         });
 
@@ -479,7 +479,7 @@ public class GUI extends javax.swing.JFrame {
         jLabel24.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
         jLabel24.setText("Rent a Car");
 
-        jLabel25.setText("Date");
+        jLabel25.setText("Report Date");
 
         jLabel26.setText("Date");
 
@@ -978,16 +978,26 @@ public class GUI extends javax.swing.JFrame {
         }
     }
 
-    private void CompanyRentalReportActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+    private void CompanyRentalReportActionPerformed(String date) {
+        try {
+            CompanyReport report = new CompanyReport(database, date, false);
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+            System.out.println(e.getMessage());
+        }
     }
 
     private void LocationRentalReportActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
     }
 
-    private void CompanyReturnReportActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+    private void CompanyReturnReportActionPerformed(String date) {
+        try {
+            CompanyReport report = new CompanyReport(database, date, true);
+        } catch (Exception e) {
+            ErrorTemplate er = new ErrorTemplate(e.getMessage());
+            System.out.println(e.getMessage());
+        }
     }
 
     private void LocationReturnReportActionPerformed(java.awt.event.ActionEvent evt) {
