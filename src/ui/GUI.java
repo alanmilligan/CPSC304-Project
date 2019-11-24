@@ -137,6 +137,10 @@ public class GUI extends javax.swing.JFrame {
         RequestRental = new javax.swing.JButton();
         jLabel45 = new javax.swing.JLabel();
         ReturnRentID = new javax.swing.JTextField();
+        jLabel43 = new javax.swing.JLabel();
+        RentalReportCity = new javax.swing.JTextField();
+        ReturnReportCity = new javax.swing.JTextField();
+        jLabel46 = new javax.swing.JLabel();
         TablePanel = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
         TableTable = new javax.swing.JTable();
@@ -425,7 +429,6 @@ public class GUI extends javax.swing.JFrame {
         SearchType.getAccessibleContext().setAccessibleName("");
 
         TabbedPane.addTab("Customer", CustomerPanel);
-
         jLabel6.setFont(new java.awt.Font("Lucida Grande", 1, 18)); // NOI18N
         jLabel6.setText("Generate a Report");
 
@@ -522,6 +525,22 @@ public class GUI extends javax.swing.JFrame {
 
         jLabel45.setText("Rent ID");
 
+        jLabel43.setText("City");
+
+        RentalReportCity.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RentalReportCityActionPerformed(evt);
+            }
+        });
+
+        ReturnReportCity.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ReturnReportCityActionPerformed(evt);
+            }
+        });
+
+        jLabel46.setText("City");
+
         javax.swing.GroupLayout ClerkPanelLayout = new javax.swing.GroupLayout(ClerkPanel);
         ClerkPanel.setLayout(ClerkPanelLayout);
         ClerkPanelLayout.setHorizontalGroup(
@@ -612,13 +631,23 @@ public class GUI extends javax.swing.JFrame {
                                                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                         .addComponent(RentalReportLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                                        .addComponent(CompanyReturnReport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addComponent(LocationReturnReport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                         .addGroup(ClerkPanelLayout.createSequentialGroup()
                                                                                 .addGap(14, 14, 14)
-                                                                                .addComponent(jLabel19)
-                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                                                .addComponent(ReturnReportLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                                        .addComponent(CompanyReturnReport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                                        .addComponent(LocationReturnReport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                                                .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                                                        .addGroup(ClerkPanelLayout.createSequentialGroup()
+                                                                                                .addComponent(jLabel46)
+                                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                                                .addComponent(ReturnReportCity, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                                                        .addGroup(ClerkPanelLayout.createSequentialGroup()
+                                                                                                .addComponent(jLabel19)
+                                                                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                                                .addComponent(ReturnReportLocation, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ClerkPanelLayout.createSequentialGroup()
+                                                                        .addComponent(jLabel43)
+                                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(RentalReportCity, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                                         .addComponent(LocationRentalReport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE))
                                                 .addComponent(CompanyRentalReport, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, ClerkPanelLayout.createSequentialGroup()
@@ -716,12 +745,37 @@ public class GUI extends javax.swing.JFrame {
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(NewRentalRTime, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addComponent(jLabel31))))
+                                                        .addComponent(jLabel31)))
+                                        .addGroup(ClerkPanelLayout.createSequentialGroup()
+                                                .addComponent(CompanyRentalReport)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(LocationRentalReport)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel18)
+                                                        .addComponent(RentalReportLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addGap(2, 2, 2)
+                                                .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel43)
+                                                        .addComponent(RentalReportCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(CompanyReturnReport)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(LocationReturnReport)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel19)
+                                                        .addComponent(ReturnReportLocation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(ClerkPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel46)
+                                                        .addComponent(ReturnReportCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(RequestRental)
                                 .addContainerGap(66, Short.MAX_VALUE))
         );
 
+        TabbedPane.addTab("Clerk", ClerkPanel);
         TabbedPane.addTab("Clerk", ClerkPanel);
 
         TableTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -1076,6 +1130,16 @@ public class GUI extends javax.swing.JFrame {
         }
     }
 
+    private void RentalReportCityActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+    private void ReturnReportCityActionPerformed(java.awt.event.ActionEvent evt) {
+        // TODO add your handling code here:
+    }
+
+
+
 
 
 
@@ -1136,6 +1200,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JTextField NewRentalRDate;
     private javax.swing.JTextField NewRentalRTime;
     private javax.swing.JTextField NewRentalType;
+    private javax.swing.JTextField RentalReportCity;
     private javax.swing.JTextField RentalReportLocation;
     private javax.swing.JTextField ReportDateInput;
     private javax.swing.JButton RequestRental;
@@ -1153,6 +1218,7 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JTextField ReturnGas;
     private javax.swing.JTextField ReturnOdometer;
     private javax.swing.JTextField ReturnRentID;
+    private javax.swing.JTextField ReturnReportCity;
     private javax.swing.JTextField ReturnReportLocation;
     private javax.swing.JButton SearchExecute;
     private javax.swing.JTextField SearchFrom;
@@ -1203,8 +1269,10 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel40;
     private javax.swing.JLabel jLabel41;
     private javax.swing.JLabel jLabel42;
+    private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
     private javax.swing.JLabel jLabel45;
+    private javax.swing.JLabel jLabel46;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;

@@ -3,9 +3,10 @@ package database;
 import exceptions.InputException;
 import model.*;
 
-import java.io.InputStream;
+import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class DataBaseHandler {
@@ -21,7 +22,9 @@ public class DataBaseHandler {
     public ArrayList<Vehicle> vehicles = new ArrayList<>();
     public ArrayList<Return> returns = new ArrayList<>();
     public ArrayList<Reservation> reservations = new ArrayList<>();
-    int currConf = 9999;
+    public int currConf = 9999;
+    public int currRent = 9999;
+    public int emptyTankFee = 100;
 
 
 
@@ -201,6 +204,15 @@ public class DataBaseHandler {
             System.out.println(e.getMessage());
         }
         System.out.println(rents);
+
+        int curr = -1;
+        for (Rent r: rents) {
+            if (r.getRid() > curr) {
+                curr = r.getRid();
+            }
+        }
+        currRent = curr + 1;
+
         return rents;
     }
 
@@ -226,26 +238,33 @@ public class DataBaseHandler {
 
     //run sql scripts/populate database
     private void setup(){
-//        File initialData = new File("src/database/init.sql");
-//        try {
-//            InputStream stream = new DataInputStream(new FileInputStream(initialData));
-//            executeScript(stream);
-//        } catch (FileNotFoundException e) {
-//            System.out.println("File not found");
-//        } catch (SQLException e) {
-//            System.out.println("Error setting up database");
-//        }
-
         getCustomers();
         getRents();
+        System.out.println(rents.size());
         getReservations();
         getReturns();
         getVehicleTypes();
         getVehicles();
+
+//        Stuff for testing leave commented out
 //        searchCars("Sedan", "Kits", "", "");
 //        searchCars("", "UBC", "", "");
 //        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
 //        searchCars("Sedan", "UBC", "2019-05-02 05:10:00", "2019-04-05 05:10:00");
+//        try {
+//            System.out.println(makeRentNoReservation("Kobe Bryant", "MAMBA24", "Truck",
+//                    "2020-02-02", "03:33:33", "2020-02-03", "03:33:33", "mamba", 1231231231, 32323, "UBC"));
+//            System.out.println(rents.size());
+//        } catch (InputException e) {
+//            System.out.println(e.getMessage());
+//        }
+        try {
+            System.out.println(handleRentReport("2020-02-02", "UBC", "Vancouver"));
+            System.out.println(handleRentReport("2019-07-01", "", ""));
+            System.out.println(handleRentReportCount("2019-07-01", "UBC","Vancouver"));
+        } catch (InputException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -322,7 +341,7 @@ public class DataBaseHandler {
          if (type.equals("")) {
              type = "%";
          } if (location.equals("")) {
-             location = "%";
+             location = "UBC";
          }
          try {
              PreparedStatement ps;
@@ -372,8 +391,7 @@ public class DataBaseHandler {
                  Timestamp endDate = Timestamp.valueOf(to);
                  if (startDate.after(endDate)) {
                      System.out.println("Improper dates!");
-                     //Todo SHOW GUI ERROR for improper dates.
-                     return new ArrayList<>();
+                     throw new InputException("Improper dates! Start after end");
                  }
                  p = connection.prepareStatement("SELECT COUNT(*) as total FROM Vehicle v WHERE v.vtname LIKE ? AND " +
                          "v.location LIKE ? AND NOT EXISTS (SELECT * FROM Rent r WHERE v.vlicense = r.vlicense AND (" +
@@ -397,7 +415,6 @@ public class DataBaseHandler {
          } catch (SQLException e) {
              System.out.println(e.getMessage());
          } catch (IllegalArgumentException e) {
-             //TODO SHOW GUI error for improper date.
              throw new InputException("Timestamp format must be yyyy-mm-dd hh:mm:ss[.fffffffff]");
          }
 
@@ -447,23 +464,342 @@ public class DataBaseHandler {
             rollbackConnection();
             throw new InputException("SQL error :(");
         }
+    }
+
+    public Reservation findReservation(int confNumber) throws InputException {
+        Reservation r = null;
+        try {
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM Reservation WHERE confNo = " + Integer.toString(confNumber));
+            while(rs.next()) {
+                r = new Reservation(rs.getInt("confNo"), rs.getString("vtname"),
+                        rs.getString("dlicense"), rs.getTimestamp("fromDate"),
+                        rs.getTimestamp("toDate"));
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        if (r == null) {
+            throw new InputException("Reservation Number with given Confirmation Number not found!");
+        }
+
+        return r;
 
     }
 
-    //TODO figure out return type
-    public void verifyReservation() {
-        //Query to find there exists a car that is allowed with constraints
+    //Todo ADD cardName into GUI, also Card type is not needed
+    //Todo Add a GUI field to specify the location when renting a car with reservation because the project spec is stupid
+    public Rent makeRent(Reservation r, String cardName, int cardNo, int expDate, String location) throws InputException {
+        ArrayList<Vehicle> cars = searchCars(r.getVtname(), location, r.getFromDate().toString(), r.getToDate().toString());
+        if (cars.size() == 0) {
+            throw new InputException("Car type specified for your reservation is no longer available");
+        }else {
+            Rent rent = new Rent(currRent, cars.get(0).getVlicense(), r.getDlicense(), r.getFromDate(), r.getToDate(),
+                    cars.get(0).getOdometer(),cardName, cardNo, expDate, r.getConfNo());
+            try {
+                PreparedStatement ps = connection.prepareStatement("INSERT INTO Rent VALUES (?,?,?,?,?,?,?,?,?,?)");
+                ps.setInt(1, rent.getRid());
+                ps.setString(2, rent.getVlicense());
+                ps.setString(3, rent.getDlicense());
+                ps.setTimestamp(4, rent.getFromDate());
+                ps.setTimestamp(5, rent.getToDate());
+                ps.setInt(6, rent.getOdometer());
+                ps.setString(7, rent.getCardName());
+                ps.setInt(8, rent.getCardNo());
+                ps.setInt(9, rent.getExpDate());
+                ps.setInt(10, rent.getConfNo());
+
+                PreparedStatement p = connection.prepareStatement("UPDATE Vehicle SET status = 'Rented' WHERE vlicense = ?");
+                p.setString(1, rent.getVlicense());
+                p.executeUpdate();
+                connection.commit();
+                p.close();
+                getRents();
+                getVehicles();
+                return rent;
+            } catch (SQLException e) {
+                System.out.println("SQL ERROR");
+                System.out.println(e.getMessage());
+                rollbackConnection();
+                throw new InputException("SQL error :(");
+            }
+        }
+    }
+
+    public Rent makeRentNoReservation(String name, String dlicense, String type, String pdate, String ptime, String rdate, String rtime, String cardName, int cardNo, int expDate, String location) throws InputException {
+        boolean customerFound = false;
+        for (Customer c: customers) {
+            if (c.getDlicense().equals(dlicense)) {
+                customerFound = true;
+            }
+        }
+        if (!customerFound) {
+            throw new InputException("No Customer with specified license found. Please register customer in the Customer tab!");
+        }
+
+        Timestamp start = Timestamp.valueOf(pdate + " " + ptime);
+        Timestamp end = Timestamp.valueOf(rdate + " " + rtime);
+        if (start.after(end)) {
+            throw new InputException("Invalid dates! Start is after end");
+        }
+        ArrayList<Vehicle> availableVehicles = searchCars(type, location, pdate + " " + ptime, rdate + " " + rtime);
+        if (availableVehicles.size() == 0) {
+            throw new InputException("No vehicles available at that time!");
+        }
+        Rent rent = new Rent(currRent, availableVehicles.get(0).getVlicense(), dlicense, start, end,
+                availableVehicles.get(0).getOdometer(),cardName, cardNo, expDate, null);
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Rent VALUES (?,?,?,?,?,?,?,?,?,?)");
+            ps.setInt(1, rent.getRid());
+            ps.setString(2, rent.getVlicense());
+            ps.setString(3, rent.getDlicense());
+            ps.setTimestamp(4, rent.getFromDate());
+            ps.setTimestamp(5, rent.getToDate());
+            ps.setInt(6, rent.getOdometer());
+            ps.setString(7, rent.getCardName());
+            ps.setInt(8, rent.getCardNo());
+            ps.setInt(9, rent.getExpDate());
+            ps.setNull(10,java.sql.Types.INTEGER);
+
+            ps.executeUpdate();
+            connection.commit();
+            ps.close();
+
+            PreparedStatement p = connection.prepareStatement("UPDATE Vehicle SET status = 'Rented' WHERE vlicense = ?");
+            p.setString(1, rent.getVlicense());
+            p.executeUpdate();
+            connection.commit();
+            p.close();
+            getRents();
+            getVehicles();
+            return rent;
+        } catch (SQLException e) {
+            System.out.println("SQL ERROR");
+            System.out.println(e.getMessage());
+            rollbackConnection();
+            throw new InputException("SQL error :(");
+        }
+    }
+
+
+    public String[] handleReturn(int rentid, String date, int odometer, boolean gas) throws InputException {
+        getRents();
+        Rent r = null;
+        for (Rent rent: rents) {
+            if (rent.getRid() == rentid) {
+                r = rent;
+            }
+        }
+        if (r == null) {
+            throw new InputException("No matching rent ID!");
+        }
+
+        Timestamp rdate = Timestamp.valueOf(date);
+        if (rdate.before(r.getFromDate())) {
+            throw new InputException("Return date is before the start date!");
+        }
+
+        // Get car.
+        getVehicles();
+        Vehicle v = null;
+        for (Vehicle veh: vehicles) {
+            if (veh.getVlicense().equals(r.getVlicense())) {
+                v = veh;
+            }
+        }
+        if (v == null) {
+            throw new InputException("No matching vehicle rented out!");
+        }
+
+        // Get vehicleType.
+        getVehicleTypes();
+        VehicleType vt = null;
+        for (VehicleType vtype: vehicleTypes) {
+            if (vtype.getVtname().equals(v.getVtname())) {
+                vt = vtype;
+            }
+        }
+        if (vt == null) {
+            throw new InputException("No matching vehicle type!");
+        }
+
+        // Calculate Cost.
+        int odometerDiff = odometer - r.getOdometer();
+        if (odometerDiff < 0) {
+            throw new InputException("New odometer value is less than odometer value before rental!");
+        }
+        int kmrate = vt.getKrate();
+        int value = kmrate * odometerDiff;
+        if (!gas) {
+            value += emptyTankFee;
+        }
+
+        String fulltank = gas ? "Y" : "N";
+
+        getReturns();
+        for (Return ret: returns) {
+            if (ret.getRid() == r.getRid()) {
+                throw new InputException("Vehicle for this rental already returned!");
+            }
+        }
+
+        // Insert return value, update car.
+        try {
+            PreparedStatement ps = connection.prepareStatement("INSERT INTO Return VALUES (?,?,?,?,?)");
+            ps.setInt(1, r.getRid());
+            ps.setTimestamp(2, rdate);
+            ps.setInt(3, odometer);
+            ps.setString(4, fulltank);
+            ps.setInt(5, value);
+            ps.executeUpdate();
+            connection.commit();
+            ps.close();
+            getReturns();
+            PreparedStatement p = connection.prepareStatement("UPDATE  Vehicle SET status = 'Available', odometer = ? " +
+                    "WHERE vlicense = ?");
+            p.setInt(1, odometer);
+            p.setString(2, v.getVlicense());
+            p.executeUpdate();
+            connection.commit();
+            p.close();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            throw new InputException("SQL Error :(");
+        }
+
+        String costExplanation = "Vehicle Type " + vt.getVtname() + " kmRate = " + kmrate + " \n Odometer Difference = " +
+                "" + odometerDiff + "\n KmRate cost = " + odometerDiff + " * " + kmrate + " = " + Integer.toString(odometerDiff * kmrate);
+        if (!gas) {
+            costExplanation = costExplanation + "\n Tank not returned full, added $100 extra cost \n " +
+                    "Final cost = " + value;
+        }
+
+        return new String[] {Integer.toString(r.getRid()), r.getFromDate().toString(), rdate.toString(),
+                Integer.toString(value), costExplanation};
 
     }
 
-    //TODO figure out return type
-    public void findReservation() {
-        //SELECT *
-        //FROM Reservation R
-        //WHERE R.confNumber = ConfNumber
+    // Getting Reports (part 1 of 2)
+    public ArrayList<RentReport> handleRentReport(String date, String location, String city) throws InputException {
+        ArrayList<RentReport> reportsReturned = new ArrayList<>();
+        try {
+            String start = date + " 00:00:00";
+            String end = date + " 23:59:59";
+            PreparedStatement ps;
+            if (location.equals("") && city.equals("")) {
+                ps = connection.prepareStatement("SELECT rid, r.vlicense AS vlicense, dlicense,  " +
+                        "fromDate, toDate, r.odometer AS odometer, cardName, cardNo, ExpDate, confNo, " +
+                        "v.location as location, v.city as city, v.vtname as vtname " +
+                        "FROM Rent r, Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.vlicense = r.vlicense " +
+                        "ORDER BY v.city, v.location, v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                ps = connection.prepareStatement("SELECT rid, r.vlicense AS vlicense, dlicense,  " +
+                        "fromDate, toDate, r.odometer AS odometer, cardName, cardNo, ExpDate, confNo, " +
+                        "v.location as location, v.city as city, v.vtname as vtname " +
+                        "FROM Rent r, Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.vlicense = r.vlicense AND v.location = ? AND v.city = ? " +
+                        "ORDER BY v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+                ps.setString(3, location);
+                ps.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                RentReport r = new RentReport(rs.getInt("rid"), rs.getString("vlicense"),
+                        rs.getString("dlicense"), rs.getTimestamp("fromDate"),
+                        rs.getTimestamp("toDate"), rs.getInt("odometer"),
+                        rs.getString("cardName"), rs.getInt("cardNo"),
+                        rs.getInt("ExpDate"), rs.getInt("confNo"), rs.getString("location"),
+                        rs.getString("city"), rs.getString("vtname"));
+                reportsReturned.add(r);
+            }
+            rs.close();
+            ps.close();
+
+            return reportsReturned;
+
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
+        } catch (IllegalArgumentException e) {
+            throw new InputException("Please input a date in right format!");
+        }
     }
 
+    // Getting counts for the reports (part 2 of 2)
+    // Returns hashset that maps vtname to count and another hashset that maps branch (consisting of a string with
+    // the location and the city) to count. If branch is specified in the input just returns the total count in the second
+    // hashset.
+    public ArrayList<HashMap<String, Integer>> handleRentReportCount(String date, String location, String city) throws InputException {
+        ArrayList<HashMap<String, Integer>> counts = new ArrayList<>();
+        try {
+            String start = date + " 00:00:00";
+            String end = date + " 23:59:59";
+            PreparedStatement ps;
+            HashMap<String, Integer> vtcount = new HashMap<>();
+            if (location.equals("") && city.equals("")) {
+                ps = connection.prepareStatement("SELECT COUNT(rid) AS num, v.vtname AS vtname FROM Rent r, " +
+                        "Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.vlicense = r.vlicense GROUP BY v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                ps = connection.prepareStatement("SELECT COUNT(rid) AS num, v.vtname AS vtname FROM Rent r, " +
+                        "Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.location = ? AND v.city = ? " +
+                        "AND v.vlicense = r.vlicense GROUP BY v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+                ps.setString(3, location);
+                ps.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                vtcount.put(rs.getString("vtname"), rs.getInt("num"));
+            }
+            counts.add(vtcount);
 
 
+            // Now for the branch count.
+            PreparedStatement p;
+            HashMap<String, Integer> branchCount = new HashMap<>();
+            if (location.equals("") && city.equals("")) {
+                p = connection.prepareStatement("SELECT COUNT(rid) AS num, v.city AS city, v.location AS location " +
+                        "FROM Rent r, Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.vlicense = r.vlicense " +
+                        "GROUP BY v.city, v.location");
+                p.setTimestamp(1, Timestamp.valueOf(start));
+                p.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                p = connection.prepareStatement("SELECT COUNT(rid) AS num, v.city AS city, v.location AS location " +
+                        "FROM Rent r, Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.location = ? AND v.city = ? AND " +
+                        "v.vlicense = r.vlicense " +
+                        "GROUP BY v.city, v.location");
+                p.setTimestamp(1, Timestamp.valueOf(start));
+                p.setTimestamp(2, Timestamp.valueOf(end));
+                p.setString(3, location);
+                p.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+            rs = p.executeQuery();
+            while (rs.next()) {
+                branchCount.put(rs.getString("city") + ", " + rs.getString("location"),
+                        rs.getInt("num"));
+            }
+            counts.add(branchCount);
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
+        } catch (IllegalArgumentException e) {
+            throw new InputException("Please input a date in right format!");
+        }
 
+        return counts;
+    }
 }
