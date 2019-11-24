@@ -258,10 +258,16 @@ public class DataBaseHandler {
 //        } catch (InputException e) {
 //            System.out.println(e.getMessage());
 //        }
+//        try {
+//            System.out.println(handleRentReport("2020-02-02", "UBC", "Vancouver"));
+//            System.out.println(handleRentReport("2019-07-01", "", ""));
+//            System.out.println(handleRentReportCount("2019-07-01", "UBC","Vancouver"));
+//        } catch (InputException e) {
+//            e.printStackTrace();
+//        }
         try {
-            System.out.println(handleRentReport("2020-02-02", "UBC", "Vancouver"));
-            System.out.println(handleRentReport("2019-07-01", "", ""));
-            System.out.println(handleRentReportCount("2019-07-01", "UBC","Vancouver"));
+            System.out.println(handleReturnReport("2017-02-01", "", ""));
+            System.out.println(handleReturnReportCountVtype("2017-02-01", "", ""));
         } catch (InputException e) {
             e.printStackTrace();
         }
@@ -682,7 +688,7 @@ public class DataBaseHandler {
 
     }
 
-    // Getting Reports (part 1 of 2)
+    // Getting Rent Reports (part 1 of 2)
     public ArrayList<RentReport> handleRentReport(String date, String location, String city) throws InputException {
         ArrayList<RentReport> reportsReturned = new ArrayList<>();
         try {
@@ -800,6 +806,95 @@ public class DataBaseHandler {
             throw new InputException("Please input a date in right format!");
         }
 
+        return counts;
+    }
+
+    // Getting Return Reports (part 1 of 3)
+    public ArrayList<ReturnReport> handleReturnReport(String date, String location, String city) throws InputException {
+        ArrayList<ReturnReport> reportsReturned = new ArrayList<>();
+        try {
+            String start = date + " 00:00:00";
+            String end = date + " 23:59:59";
+            PreparedStatement ps;
+            if (location.equals("") && city.equals("")) {
+                ps = connection.prepareStatement("SELECT ret.rid AS rid, rdate, ret.odometer AS odometer, fulltank," +
+                        " value,  v.location as location, v.city as city, v.vtname as vtname FROM Rent r, Vehicle v," +
+                        " Return ret WHERE ret.rid = r.rid AND ? <= rdate AND ? >= rdate AND v.vlicense = r.vlicense" +
+                        " ORDER BY v.city, v.location, v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                ps = connection.prepareStatement("SELECT ret.rid AS rid, rdate, ret.odometer AS odometer, fulltank," +
+                        " value,  v.location as location, v.city as city, v.vtname as vtname FROM Rent r, Vehicle v," +
+                        " Return ret WHERE ret.rid = r.rid AND ? <= rdate AND ? >= rdate AND v.vlicense = r.vlicense  " +
+                        "AND v.location = ? AND v.city = ? " +
+                        " ORDER BY v.city, v.location, v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+                ps.setString(3, location);
+                ps.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                ReturnReport r = new ReturnReport(rs.getInt("rid"), rs.getTimestamp("rdate"), rs.getInt("odometer"),
+                        rs.getString("fulltank"), rs.getInt("value"), rs.getString("location"),
+                        rs.getString("city"), rs.getString("vtname"));
+                reportsReturned.add(r);
+            }
+            rs.close();
+            ps.close();
+
+            return reportsReturned;
+
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
+        } catch (IllegalArgumentException e) {
+            throw new InputException("Please input a date in right format!");
+        }
+    }
+
+    // Getting Return Reports (part 2 of 3) Gets counts/revenue by vehicletype name
+    // Returns Arraylist or arraylists which contain (numReturns, Revenue, Vtname)
+    public ArrayList<ArrayList<String>> handleReturnReportCountVtype(String date, String location, String city) throws InputException {
+        ArrayList<ArrayList<String>> counts = new ArrayList<>();
+        try {
+            String start = date + " 00:00:00";
+            String end = date + " 23:59:59";
+            PreparedStatement ps;
+            if (location.equals("") && city.equals("")) {
+                ps = connection.prepareStatement("SELECT COUNT(ret.rid) AS num, SUM(value) AS  revenue, " +
+                        "v.vtname as vtname FROM Rent r, Vehicle v, Return ret WHERE ret.rid = r.rid AND ? <= rdate " +
+                        "AND ? >= rdate AND v.vlicense = r.vlicense GROUP BY v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                ps = connection.prepareStatement("SELECT COUNT(ret.rid) AS num, SUM(value) AS  revenue, " +
+                        "v.vtname as vtname FROM Rent r, Vehicle v, Return ret WHERE ret.rid = r.rid AND ? <= rdate " +
+                        "AND ? >= rdate AND v.vlicense = r.vlicense  AND v.location = ? AND v.city = ? GROUP BY v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+                ps.setString(3, location);
+                ps.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                ArrayList<String> count = new ArrayList<>();
+                count.add(String.valueOf(rs.getInt("num")));
+                count.add(String.valueOf(rs.getInt("revenue")));
+                count.add(rs.getString("vtname"));
+                counts.add(count);
+            }
+
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
+        } catch (IllegalArgumentException e) {
+            throw new InputException("Please input a date in right format!");
+        }
         return counts;
     }
 }
