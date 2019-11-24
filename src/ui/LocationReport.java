@@ -5,17 +5,91 @@ package ui;
  * and open the template in the editor.
  */
 
+import database.DataBaseHandler;
+import exceptions.InputException;
+import model.RentReport;
+import model.ReturnReport;
+
+import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  *
  * @author alansmacbook
  */
 public class LocationReport extends javax.swing.JFrame {
 
+    DataBaseHandler db;
+
     /**
      * Creates new form LocationReport
      */
-    public LocationReport() {
+    public LocationReport(DataBaseHandler db, String date, String location, String city, boolean ret) throws InputException {
         initComponents();
+        this.db = db;
+
+        if (ret) {
+            ArrayList<ReturnReport> reports = this.db.handleReturnReport(date, location, city);
+            ArrayList<ArrayList<String>> vtCounts = this.db.handleReturnReportCountVtype(date, location, city);
+            String[] colNames = new String [] {
+                    "RID", "Return Date", "Odometer", "Full Tank", "Revenue", "Location", "City", "Vehicle Type"};
+            DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+            for (ReturnReport r: reports) {
+                String[] data = {Integer.toString(r.getRid()), r.getrDate().toString(), Integer.toString(r.getOdometer()),
+                        r.getFulltank(), Integer.toString(r.getValue()), r.getLocation(), r.getCity(), r.getVtname()};
+                dtm.addRow(data);
+            }
+            DetailsTable.setModel(dtm);
+
+            int totalCount = 0;
+            int totalRevenue = 0;
+            colNames = new String [] {"Count", "Revenue", "VehicleType"};
+            dtm = new DefaultTableModel(null, colNames);
+            for (ArrayList<String> arr: vtCounts) {
+                List<String> list = arr;
+                String data[] = list.toArray(new String[0]);
+                dtm.addRow(data);
+                totalCount += Integer.parseInt(arr.get(0));
+                totalRevenue += Integer.parseInt(arr.get(1));
+            }
+            TypeCountTable.setModel(dtm);
+            TotalTransactions.setText("Total Returns: "+ Integer.toString(totalCount));
+            TotalRevenue.setText("Total Revenue: " + Integer.toString(totalRevenue));
+
+
+        } else {
+            ArrayList<RentReport> reports = this.db.handleRentReport(date, location, city);
+            ArrayList<HashMap<String, Integer>> counts = this.db.handleRentReportCount(date, location, city);
+
+            String[] colNames = new String [] {
+                    "RID", "License Plate", "V. Type", "Drivers Licence", "From", "To", "Odometer", "Card #", "Card Name", "Expiration", "Location", "City", "Conf. Number"
+            };
+            DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+            for (RentReport r: reports) {
+                String[] data = {Integer.toString(r.getRid()), r.getVlicense(), r.getVtname(), r.getDlicense(), r.getFromDate().toString(),
+                        r.getToDate().toString(), Integer.toString(r.getOdometer()), Integer.toString(r.getCardNo()), r.getCardName(),
+                        Integer.toString(r.getExpDate()), r.getLocation(), r.getCity(), Integer.toString(r.getConfNo())};
+                dtm.addRow(data);
+            }
+            DetailsTable.setModel(dtm);
+
+            int totalCount = 0;
+            colNames = new String [] {"Vehicle Type", "Count"};
+            dtm = new DefaultTableModel(null, colNames);
+            for (String s: counts.get(0).keySet()) {
+                String data[] = {s, Integer.toString(counts.get(0).get(s))};
+                dtm.addRow(data);
+                totalCount += counts.get(0).get(s);
+            }
+            TypeCountTable.setModel(dtm);
+            TotalTransactions.setText("Total Rentals: "+ Integer.toString(totalCount));
+            TotalRevenue.setText("");
+
+        }
+
+        this.setVisible(true);
     }
 
     /**
