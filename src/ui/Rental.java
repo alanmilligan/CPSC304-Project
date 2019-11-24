@@ -13,21 +13,56 @@ package ui;
 
 
 import database.DataBaseHandler;
+import exceptions.InputException;
 
 public class Rental extends javax.swing.JFrame {
 
 
     DataBaseHandler database;
+    String name;
+    String dlicense;
+    String type;
+    String loc;
+    String pdate;
+    String ptime;
+    String rdate;
+    String rtime;
+    String rid;
+    String cardNo;
+    String cardExp;
+    String cardType;
+
 
     /**
      * Creates new form Rental
      */
-    public Rental(DataBaseHandler db) {
+    public Rental(DataBaseHandler db, String name, String dlicense, String type, String loc, String pdate, String ptime, String rdate, String rtime, String rid) {
         database = db;
         initComponents();
+        this.name = name.trim();
+        this.dlicense = dlicense.trim();
+        this.type = type.trim();
+        this.loc = loc.trim();
+        this.pdate = pdate.trim();
+        this.ptime = ptime.trim();
+        this.rdate = rdate.trim();
+        this.rtime = rtime.trim();
+        this.rid = rid.trim();
+        setValues();
         this.setVisible(true);
     }
 
+    private void setValues() {
+        RDName.setText(name);
+        RDDLicense.setText(dlicense);
+        RDType.setText(type);
+        RDLocation.setText(loc);
+        RDPDATE.setText(pdate);
+        RDPTime.setText(ptime);
+        RDRDate.setText(rdate);
+        RDRTIME.setText(rtime);
+        RDRID.setText(rid);
+    }
 
     public Rental(DataBaseHandler db, String confNo) {
         database = db;
@@ -129,14 +164,22 @@ public class Rental extends javax.swing.JFrame {
 
         jLabel20.setText("Credit Card Number");
 
-        jLabel21.setText("Credit Card Expiry");
+        jLabel21.setText("Credit Card Expiry [MMYY]");
 
         jLabel22.setText("Card Type");
 
         ConfirmRentalButton.setText("Confirm Rental");
         ConfirmRentalButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ConfirmRentalButtonActionPerformed(evt);
+                try {
+                    ConfirmRentalButtonActionPerformed(evt);
+                } catch (InputException e) {
+                    try {
+                        throw new InputException("Confirmation unsuccessful, please try again!");
+                    } catch (InputException ex) {
+                        System.out.println("error error");
+                    }
+                }
             }
         });
 
@@ -263,8 +306,12 @@ public class Rental extends javax.swing.JFrame {
         pack();
     }// </editor-fold>
 
-    private void ConfirmRentalButtonActionPerformed(java.awt.event.ActionEvent evt) {
+    private void ConfirmRentalButtonActionPerformed(java.awt.event.ActionEvent evt) throws InputException {
+        this.cardExp = CreditCardExpIO.getText();
+        this.cardNo = CreditCardNumberIO.getText();
+        this.cardType = RentalCreditCard.getText();
 
+        database.makeRentNoReservation(name, dlicense, type, pdate, ptime, rdate, rtime, cardType, Integer.parseInt(this.cardNo), Integer.parseInt(this.cardExp), loc);
 
         this.dispose();
     }

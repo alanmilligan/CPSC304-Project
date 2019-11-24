@@ -804,7 +804,7 @@ public class GUI extends javax.swing.JFrame {
         jLabel20.setText("Table:");
 
         // TODO add instructions for deletion and update here
-        jLabel21.setText("Update Customer: (cellphone, name, address, dlicense) | Delete Return: (rid)");
+        jLabel21.setText("Update Customer: (cellphone, name, address, dlicense) | Delete Return: (rid) - [Must Refresh Dropdown]");
 
         TupleEntry.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1125,16 +1125,17 @@ public class GUI extends javax.swing.JFrame {
         if (r != null) {r.dispose();}
         try {
             String name = NewRentalName.getText();
-            String licnece = NewRentalLicence.getText();
+            String license = NewRentalLicence.getText();
             String type = NewRentalType.getText();
             String location = NewRentalLocation.getText();
             String pdate = NewRentalPDate.getText();
             String ptime = NewRentalPTime.getText();
             String rdate = NewRentalRDate.getText();
             String rtime = NewRentalRTime.getText();
+            String rid = String.valueOf(database.currRent);
 
-
-            r = new Rental(database);
+            r = new Rental(database, name, license, type, location, pdate, ptime, rdate, rtime, rid);
+            //r = new Rental(database);
 
         } catch (Exception e) {
             ErrorTemplate er = new ErrorTemplate(e.getMessage());
