@@ -32,7 +32,9 @@ public class GUI extends javax.swing.JFrame {
      */
     public GUI() {
         initComponents();
+        this.setVisible(true);
         database = new DataBaseHandler();
+
 
         try {
             Image sherwyb = new ImageIcon(this.getClass().getResource("/resources/icon.png")).getImage();
@@ -1174,7 +1176,7 @@ public class GUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GUI().setVisible(true);
+                new GUI();
             }
         });
     }
