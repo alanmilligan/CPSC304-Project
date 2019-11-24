@@ -6,6 +6,7 @@ import model.*;
 import java.io.*;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class DataBaseHandler {
@@ -237,17 +238,6 @@ public class DataBaseHandler {
 
     //run sql scripts/populate database
     private void setup(){
-//        File initialData = new File("src/database/init.sql");
-//        try {
-//            InputStream stream = new DataInputStream(new FileInputStream(initialData));
-//
-//            executeScript(stream);
-//        } catch (FileNotFoundException e) {
-//            System.out.println("File not found");
-//        } catch (SQLException e) {
-//            System.out.println("Error setting up database");
-//        }
-
         getCustomers();
         getRents();
         System.out.println(rents.size());
@@ -256,6 +246,7 @@ public class DataBaseHandler {
         getVehicleTypes();
         getVehicles();
 
+//        Stuff for testing leave commented out
 //        searchCars("Sedan", "Kits", "", "");
 //        searchCars("", "UBC", "", "");
 //        searchCars("Sedan", "UBC", "2019-02-02 05:10:00", "2019-02-05 05:10:00");
@@ -267,6 +258,13 @@ public class DataBaseHandler {
 //        } catch (InputException e) {
 //            System.out.println(e.getMessage());
 //        }
+        try {
+            System.out.println(handleRentReport("2020-02-02", "UBC", "Vancouver"));
+            System.out.println(handleRentReport("2019-07-01", "", ""));
+            System.out.println(handleRentReportCount("2019-07-01", "UBC","Vancouver"));
+        } catch (InputException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -682,5 +680,126 @@ public class DataBaseHandler {
         return new String[] {Integer.toString(r.getRid()), r.getFromDate().toString(), rdate.toString(),
                 Integer.toString(value), costExplanation};
 
+    }
+
+    // Getting Reports (part 1 of 2)
+    public ArrayList<RentReport> handleRentReport(String date, String location, String city) throws InputException {
+        ArrayList<RentReport> reportsReturned = new ArrayList<>();
+        try {
+            String start = date + " 00:00:00";
+            String end = date + " 23:59:59";
+            PreparedStatement ps;
+            if (location.equals("") && city.equals("")) {
+                ps = connection.prepareStatement("SELECT rid, r.vlicense AS vlicense, dlicense,  " +
+                        "fromDate, toDate, r.odometer AS odometer, cardName, cardNo, ExpDate, confNo, " +
+                        "v.location as location, v.city as city, v.vtname as vtname " +
+                        "FROM Rent r, Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.vlicense = r.vlicense " +
+                        "ORDER BY v.city, v.location, v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                ps = connection.prepareStatement("SELECT rid, r.vlicense AS vlicense, dlicense,  " +
+                        "fromDate, toDate, r.odometer AS odometer, cardName, cardNo, ExpDate, confNo, " +
+                        "v.location as location, v.city as city, v.vtname as vtname " +
+                        "FROM Rent r, Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.vlicense = r.vlicense AND v.location = ? AND v.city = ? " +
+                        "ORDER BY v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+                ps.setString(3, location);
+                ps.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+                RentReport r = new RentReport(rs.getInt("rid"), rs.getString("vlicense"),
+                        rs.getString("dlicense"), rs.getTimestamp("fromDate"),
+                        rs.getTimestamp("toDate"), rs.getInt("odometer"),
+                        rs.getString("cardName"), rs.getInt("cardNo"),
+                        rs.getInt("ExpDate"), rs.getInt("confNo"), rs.getString("location"),
+                        rs.getString("city"), rs.getString("vtname"));
+                reportsReturned.add(r);
+            }
+            rs.close();
+            ps.close();
+
+            return reportsReturned;
+
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
+        } catch (IllegalArgumentException e) {
+            throw new InputException("Please input a date in right format!");
+        }
+    }
+
+    // Getting counts for the reports (part 2 of 2)
+    // Returns hashset that maps vtname to count and another hashset that maps branch (consisting of a string with
+    // the location and the city) to count. If branch is specified in the input just returns the total count in the second
+    // hashset.
+    public ArrayList<HashMap<String, Integer>> handleRentReportCount(String date, String location, String city) throws InputException {
+        ArrayList<HashMap<String, Integer>> counts = new ArrayList<>();
+        try {
+            String start = date + " 00:00:00";
+            String end = date + " 23:59:59";
+            PreparedStatement ps;
+            HashMap<String, Integer> vtcount = new HashMap<>();
+            if (location.equals("") && city.equals("")) {
+                ps = connection.prepareStatement("SELECT COUNT(rid) AS num, v.vtname AS vtname FROM Rent r, " +
+                        "Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.vlicense = r.vlicense GROUP BY v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                ps = connection.prepareStatement("SELECT COUNT(rid) AS num, v.vtname AS vtname FROM Rent r, " +
+                        "Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.location = ? AND v.city = ? " +
+                        "AND v.vlicense = r.vlicense GROUP BY v.vtname");
+                ps.setTimestamp(1, Timestamp.valueOf(start));
+                ps.setTimestamp(2, Timestamp.valueOf(end));
+                ps.setString(3, location);
+                ps.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                vtcount.put(rs.getString("vtname"), rs.getInt("num"));
+            }
+            counts.add(vtcount);
+
+
+            // Now for the branch count.
+            PreparedStatement p;
+            HashMap<String, Integer> branchCount = new HashMap<>();
+            if (location.equals("") && city.equals("")) {
+                p = connection.prepareStatement("SELECT COUNT(rid) AS num, v.city AS city, v.location AS location " +
+                        "FROM Rent r, Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.vlicense = r.vlicense " +
+                        "GROUP BY v.city, v.location");
+                p.setTimestamp(1, Timestamp.valueOf(start));
+                p.setTimestamp(2, Timestamp.valueOf(end));
+            } else if (!location.equals("") && !city.equals("")) {
+                p = connection.prepareStatement("SELECT COUNT(rid) AS num, v.city AS city, v.location AS location " +
+                        "FROM Rent r, Vehicle v WHERE ? <= r.fromDate AND ? >= r.fromDate AND v.location = ? AND v.city = ? AND " +
+                        "v.vlicense = r.vlicense " +
+                        "GROUP BY v.city, v.location");
+                p.setTimestamp(1, Timestamp.valueOf(start));
+                p.setTimestamp(2, Timestamp.valueOf(end));
+                p.setString(3, location);
+                p.setString(4, city);
+            } else {
+                throw new InputException("Need both location and city or neither!");
+            }
+            rs = p.executeQuery();
+            while (rs.next()) {
+                branchCount.put(rs.getString("city") + ", " + rs.getString("location"),
+                        rs.getInt("num"));
+            }
+            counts.add(branchCount);
+        } catch (SQLException e) {
+            throw new InputException("SQL Error :(");
+        } catch (IllegalArgumentException e) {
+            throw new InputException("Please input a date in right format!");
+        }
+
+        return counts;
     }
 }
