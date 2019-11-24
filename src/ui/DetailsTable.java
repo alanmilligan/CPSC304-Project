@@ -8,19 +8,48 @@
 package ui;
 
 
+import model.Vehicle;
+
+import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
+
 /**
  *
  * @author alansmacbook
  */
 public class DetailsTable extends javax.swing.JFrame {
 
+    private String type;
+    private String location;
+    private String from;
+    private String to;
+    private ArrayList<Vehicle> result;
+
     /**
      * Creates new form DetailsTable
      */
-    public DetailsTable() {
-        initComponents();
+    public DetailsTable(String type, String location, String from, String to, ArrayList<Vehicle> result) {
+        if (type.isEmpty()) {this.type = "Any";} else {this.type = type.trim();}
+        if (location.isEmpty()) {this.location = "UBC";} else {this.location = location.trim();}
+        if (from.isEmpty()) {this.from = "Any";} else {this.from = from.trim();}
+        if (to.isEmpty()) {this.to = "Any";} else {this.to = to.trim();}
+        this.result = result;
 
+        initComponents();
+        populateTable();
         this.setVisible(true);
+    }
+
+    // Populates the details table with results form the searchCars Query
+    private void populateTable() {
+        String colNames[] = {"vlicense", "make", "model", "year", "color", "odometer", "status", "vtname", "location", "city"};
+        DefaultTableModel dtm = new DefaultTableModel(null, colNames);
+        java.util.List<Vehicle> vehicles = this.result;
+        for(int x = 0, y = vehicles.size(); x < y; x++) {
+            Vehicle v = vehicles.get(x);
+            dtm.addRow(v.getData());
+        }
+        DTable.setModel(dtm);
     }
 
     /**
@@ -40,7 +69,7 @@ public class DetailsTable extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         DetailsHeader.setFont(new java.awt.Font("Lucida Grande", 1, 14)); // NOI18N
-        DetailsHeader.setText("Observing <TYPE> available at <LOCATION> from <FROM> to <TO>");
+        DetailsHeader.setText("Observing " + this.type + " available at " + this.location + " from " + this.from + " to " + this.to);
 
         DTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
