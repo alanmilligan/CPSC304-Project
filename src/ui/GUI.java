@@ -7,6 +7,7 @@ import model.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -803,7 +804,7 @@ public class GUI extends javax.swing.JFrame {
         jLabel20.setText("Table:");
 
         // TODO add instructions for deletion and update here
-        jLabel21.setText("Insert Customer: (cellphone, name, address, dlicense) | Delete Return: (rid)");
+        jLabel21.setText("Update Customer: (cellphone, name, address, dlicense) | Delete Return: (rid)");
 
         TupleEntry.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -813,9 +814,19 @@ public class GUI extends javax.swing.JFrame {
 
         jLabel22.setText("Tuple:");
 
-        InsertButton.setText("Insert");
+        InsertButton.setText("Update");
+        InsertButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                UpdateActionPerformed(evt);
+            }
+        });
 
         DeleteButton.setText("Delete");
+        DeleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeleteActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout TablePanelLayout = new javax.swing.GroupLayout(TablePanel);
         TablePanel.setLayout(TablePanelLayout);
@@ -998,12 +1009,12 @@ public class GUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }
 
-    private void InsertActionPerformed(java.awt.event.ActionEvent evt) {
+    private void UpdateActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
         // Inserts into the Customer table
         String attributes = TupleEntry.getText();
         List<String> insertList = Arrays.asList(attributes.split("\\s*,\\s*"));
-        database.addCustomer(insertList.get(0), insertList.get(1), insertList.get(2), insertList.get(3));
+        database.updateCustomer(insertList.get(0), insertList.get(1), insertList.get(2), insertList.get(3));
     }
 
     private void DeleteActionPerformed(java.awt.event.ActionEvent evt) {

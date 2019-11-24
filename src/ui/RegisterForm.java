@@ -136,9 +136,9 @@ public class RegisterForm extends javax.swing.JFrame {
     private void RegisterCompleteButtonActionPerformed(java.awt.event.ActionEvent evt) {
         try {
             String address = RegisterAddress.getText();
-            String cellNumber = RegisterAddress.getText();
-            String licence = RegisterAddress.getText();
-            String name = RegisterAddress.getText();
+            String cellNumber = RegisterCell.getText();
+            String licence = RegisterLicence.getText();
+            String name = RegisterName.getText();
 
             if (address.equals("")||cellNumber.equals("")||licence.equals("")||name.equals("")) {
                 throw new InputException("You have to fill out the form!");
@@ -146,7 +146,7 @@ public class RegisterForm extends javax.swing.JFrame {
 
             //TODO integrity check
 
-            database.addCustomer(address,cellNumber,licence,name);
+            database.addCustomer(cellNumber, name, address, licence);
 
             this.dispose();
         } catch (Exception e) {
