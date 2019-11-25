@@ -39,20 +39,7 @@ public class DataBaseHandler {
         }
 
         Login log = new Login();
-
-//        try {
-//            if (connection != null) {
-//                connection.close();
-//            }
-//
-//            connection = DriverManager.getConnection(ORACLE_URL, "ora_jacquesc", "a17816802");
-//            connection.setAutoCommit(false);
-//
-//            System.out.println("\nConnected to Oracle!");
-//        } catch (SQLException e) {
-//            System.out.println(EXCEPTION_TAG + " " + e.getMessage());
-//        }
-//        setup();
+        
     }
 
     //prompt oracle login
@@ -425,15 +412,6 @@ public class DataBaseHandler {
          }
 
          return result;
-
-         //SELECT V.type, V.location, from, to, COUNT(DISTINCT(V.vid))
-         //FROM Vehicle V,
-         //WHERE NOT EXISTS (SELECT R.rid
-         //                  FROM Rent R
-         //                  WHERE R.vid = V.vid AND (R.fromDate < DATE(to) AND R.toDate > DATE(from))
-         //                        OR R.fromDate > DATE(to))
-         //GROUP BY V.type
-         //ORDER BY COUNT(DISTINCT(vid)) ASC;
     }
 
 
