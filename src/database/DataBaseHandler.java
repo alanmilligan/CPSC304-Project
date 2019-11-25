@@ -366,6 +366,11 @@ public class DataBaseHandler {
              } else {
                  Timestamp startDate = Timestamp.valueOf(from);
                  Timestamp endDate = Timestamp.valueOf(to);
+                 if(startDate.before(Timestamp.valueOf("2001-01-01 00:00:00"))) {
+                     throw new InputException("Date should be after after Jan 1, 2001!");
+                 } else if (endDate.after(Timestamp.valueOf("2050-01-01 00:00:00"))){
+                     throw new InputException("Date should be before 2050!");
+                 }
                  if (startDate.after(endDate)) {
                      throw new InputException("Improper dates! Start after end");
                  }
@@ -502,8 +507,6 @@ public class DataBaseHandler {
 
     }
 
-    //Todo ADD cardName into GUI, also Card type is not needed
-    //Todo Add a GUI field to specify the location when renting a car with reservation
     public Rent makeRent(Reservation r, String cardName, int cardNo, int expDate, String location) throws InputException {
         ArrayList<Vehicle> cars = searchCars(r.getVtname(), location, r.getFromDate().toString(), r.getToDate().toString());
         if (cars.size() == 0) {
@@ -741,16 +744,22 @@ public class DataBaseHandler {
         return returnInfo;
     }
 
-
-
-
-
-
-
-
-
-
-
+    public void checkBranchExists(String location, String city) throws InputException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) as num FROM Vehicle " +
+                    "WHERE location = ? AND city = ?");
+            ps.setString(1, location);
+            ps.setString(2, city);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            int count = rs.getInt("num");
+            if (count == 0) {
+                throw new InputException("Branch does not exist!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
 
 
@@ -771,6 +780,7 @@ public class DataBaseHandler {
                 ps.setTimestamp(1, Timestamp.valueOf(start));
                 ps.setTimestamp(2, Timestamp.valueOf(end));
             } else if (!location.equals("") && !city.equals("")) {
+                checkBranchExists(location, city);
                 ps = connection.prepareStatement("SELECT rid, r.vlicense AS vlicense, dlicense,  " +
                         "fromDate, toDate, r.odometer AS odometer, cardName, cardNo, ExpDate, confNo, " +
                         "v.location as location, v.city as city, v.vtname as vtname " +
@@ -891,6 +901,7 @@ public class DataBaseHandler {
                 ps.setTimestamp(1, Timestamp.valueOf(start));
                 ps.setTimestamp(2, Timestamp.valueOf(end));
             } else if (!location.equals("") && !city.equals("")) {
+                checkBranchExists(location, city);
                 ps = connection.prepareStatement("SELECT ret.rid AS rid, rdate, ret.odometer AS odometer, fulltank," +
                         " value,  v.location as location, v.city as city, v.vtname as vtname FROM Rent r, Vehicle v," +
                         " Return ret WHERE ret.rid = r.rid AND ? <= rdate AND ? >= rdate AND v.vlicense = r.vlicense  " +
