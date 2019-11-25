@@ -39,7 +39,7 @@ public class DataBaseHandler {
         }
 
         Login log = new Login();
-        
+
     }
 
     //prompt oracle login
