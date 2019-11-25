@@ -5,8 +5,23 @@ public class RentalReceipt extends javax.swing.JFrame {
     /**
      * Creates new form RentalReceipt
      */
-    public RentalReceipt() {
+    public RentalReceipt(String name,String dlicense,String type,String carLicence,String loc,String pdate,String ptime,
+                         String rdate,String rtime,String rid,String cardNo,String cardExp,String cardType) {
         initComponents();
+        RDName.setText(name);
+        RDDLicense.setText(dlicense);
+        RDType.setText(type);
+        RDCarLicence.setText(carLicence);
+        RDLocation.setText(loc);
+        RDPDATE.setText(pdate);
+        RDPTime.setText(ptime);
+        RDRDate.setText(rdate);
+        RDRTime.setText(rtime);
+        RDRID.setText(rid);
+        RDCardNum.setText(cardNo);
+        RDExpDate.setText(cardExp);
+        RDCardName.setText(cardType);
+        this.setVisible(true);
     }
 
     /**
