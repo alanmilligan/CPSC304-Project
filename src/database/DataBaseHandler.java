@@ -366,6 +366,11 @@ public class DataBaseHandler {
              } else {
                  Timestamp startDate = Timestamp.valueOf(from);
                  Timestamp endDate = Timestamp.valueOf(to);
+                 if(startDate.before(Timestamp.valueOf("2001-01-01 00:00:00"))) {
+                     throw new InputException("Date should be after after Jan 1, 2001!");
+                 } else if (endDate.after(Timestamp.valueOf("2050-01-01 00:00:00"))){
+                     throw new InputException("Date should be before 2050!");
+                 }
                  if (startDate.after(endDate)) {
                      throw new InputException("Improper dates! Start after end");
                  }
