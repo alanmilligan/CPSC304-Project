@@ -544,13 +544,18 @@ public class DataBaseHandler {
     }
 
     public Rent makeRentNoReservation(String name, String dlicense, String type, String pdate, String ptime, String rdate, String rtime, String cardName, int cardNo, int expDate, String location) throws InputException {
-        boolean customerFound = false;
-        for (Customer c: customers) {
-            if (c.getDlicense().equals(dlicense)) {
-                customerFound = true;
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM Customer WHERE dlicense = ?");
+            ps.setString(1, dlicense);
+            ResultSet rs = ps.executeQuery();
+            String licensetest = null;
+            while(rs.next()) {
+                licensetest = rs.getString("dlicense");
             }
-        }
-        if (!customerFound) {
+            if (licensetest == null) {
+                throw new InputException("No Customer with specified license found. Please register customer in the Customer tab!");
+            }
+        } catch (SQLException e) {
             throw new InputException("No Customer with specified license found. Please register customer in the Customer tab!");
         }
 
