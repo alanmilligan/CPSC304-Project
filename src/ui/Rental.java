@@ -41,6 +41,7 @@ public class Rental extends javax.swing.JFrame {
      */
     public Rental(DataBaseHandler db, String name, String dlicense, String type, String loc, String pdate, String ptime, String rdate, String rtime, String rid) {
         database = db;
+        db.getRents();
         initComponents();
         this.name = name.trim();
         this.dlicense = dlicense.trim();
@@ -69,6 +70,7 @@ public class Rental extends javax.swing.JFrame {
 
     public Rental(DataBaseHandler db, String confNo, String location) {
         database = db;
+        db.getRents();
         initComponents();
         try {
             Reservation r = db.findReservation(Integer.valueOf(confNo));
@@ -338,7 +340,7 @@ public class Rental extends javax.swing.JFrame {
             rent = database.makeRentNoReservation(name, dlicense, type, pdate, ptime, rdate, rtime, cardType, Integer.parseInt(this.cardNo), Integer.parseInt(this.cardExp), loc);
         }
 
-        RentalReceipt rr = new RentalReceipt(name,dlicense,type,rent.getDlicense(),loc,pdate,ptime,rdate,rtime,rid,cardNo,cardExp,cardType);
+        RentalReceipt rr = new RentalReceipt(name,dlicense,type,rent.getVlicense(),loc,pdate,ptime,rdate,rtime,rid,cardNo,cardExp,cardType);
         this.dispose();
     }
 
