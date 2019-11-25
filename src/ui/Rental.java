@@ -14,6 +14,7 @@ package ui;
 
 import database.DataBaseHandler;
 import exceptions.InputException;
+import model.Rent;
 import model.Reservation;
 
 public class Rental extends javax.swing.JFrame {
@@ -325,13 +326,19 @@ public class Rental extends javax.swing.JFrame {
         this.cardExp = CreditCardExpIO.getText();
         this.cardNo = CreditCardNumberIO.getText();
         this.cardType = RentalCreditCard.getText();
+        Rent rent = null;
 
         if (this.cardExp.equals("") || this.cardNo.equals("") || this.cardType.equals("")) {
             throw new InputException("Please enter all the fields!");
         }
 
         if(jLabel2.getText().isEmpty()) {database.makeRent(r, cardType, Integer.parseInt(cardNo), Integer.parseInt(cardExp), loc);}
-        else {database.makeRentNoReservation(name, dlicense, type, pdate, ptime, rdate, rtime, cardType, Integer.parseInt(this.cardNo), Integer.parseInt(this.cardExp), loc);}
+
+        else {
+            rent = database.makeRentNoReservation(name, dlicense, type, pdate, ptime, rdate, rtime, cardType, Integer.parseInt(this.cardNo), Integer.parseInt(this.cardExp), loc);
+        }
+
+        RentalReceipt rr = new RentalReceipt(name,dlicense,type,rent.getDlicense(),loc,pdate,ptime,rdate,rtime,rid,cardNo,cardExp,cardType);
         this.dispose();
     }
 
