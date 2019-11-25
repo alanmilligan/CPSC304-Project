@@ -327,6 +327,10 @@ public class Rental extends javax.swing.JFrame {
         this.cardNo = CreditCardNumberIO.getText();
         this.cardType = RentalCreditCard.getText();
 
+        if (this.cardExp.equals("") || this.cardNo.equals("") || this.cardType.equals("")) {
+            throw new InputException("Please enter all the fields!");
+        }
+
         if(jLabel2.getText().isEmpty()) {database.makeRent(r, cardType, Integer.parseInt(cardNo), Integer.parseInt(cardExp), loc);}
         else {database.makeRentNoReservation(name, dlicense, type, pdate, ptime, rdate, rtime, cardType, Integer.parseInt(this.cardNo), Integer.parseInt(this.cardExp), loc);}
         this.dispose();
