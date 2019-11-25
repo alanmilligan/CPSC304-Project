@@ -427,6 +427,7 @@ public class DataBaseHandler {
 
 
     public Reservation makeReservation(String name,String license,String type,String location, String pdate,String ptime,String rdate,String rtime) throws InputException {
+        getReservations();
         Timestamp start = Timestamp.valueOf(pdate + " " + ptime);
         Timestamp end = Timestamp.valueOf(rdate + " " + rtime);
         if (start.after(end)) {
@@ -435,6 +436,21 @@ public class DataBaseHandler {
         ArrayList<Vehicle> availableVehicles = searchCars(type, location, pdate + " " + ptime, rdate + " " + rtime);
         if (availableVehicles.size() == 0) {
             throw new InputException("No vehicles available at that time!");
+        }
+
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT * FROM Customer WHERE dlicense = ?");
+            ps.setString(1, license);
+            ResultSet rs = ps.executeQuery();
+            String licensetest = null;
+            while(rs.next()) {
+                licensetest = rs.getString("dlicense");
+            }
+            if (licensetest == null) {
+                throw new InputException("User not found!");
+            }
+        } catch (SQLException e) {
+            throw new InputException("User not found!");
         }
 
         Reservation r = new Reservation(currConf, license, type, start, end);
@@ -486,6 +502,7 @@ public class DataBaseHandler {
     }
 
     public Rent makeRent(Reservation r, String cardName, int cardNo, int expDate, String location) throws InputException {
+        getRents();
         ArrayList<Vehicle> cars = searchCars(r.getVtname(), location, r.getFromDate().toString(), r.getToDate().toString());
         if (cars.size() == 0) {
             throw new InputException("Car type specified for your reservation is no longer available");
