@@ -507,8 +507,6 @@ public class DataBaseHandler {
 
     }
 
-    //Todo ADD cardName into GUI, also Card type is not needed
-    //Todo Add a GUI field to specify the location when renting a car with reservation
     public Rent makeRent(Reservation r, String cardName, int cardNo, int expDate, String location) throws InputException {
         ArrayList<Vehicle> cars = searchCars(r.getVtname(), location, r.getFromDate().toString(), r.getToDate().toString());
         if (cars.size() == 0) {
