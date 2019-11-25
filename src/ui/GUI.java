@@ -1015,7 +1015,7 @@ public class GUI extends javax.swing.JFrame {
 
     private void LocationReturnReportActionPerformed(java.awt.event.ActionEvent evt) {
         String location = ReturnReportLocation.getText();
-        String city = RentalReportCity.getText();
+        String city = ReturnReportCity.getText();
         String date = ReportDateInput.getText();
         try {
             LocationReport report = new LocationReport(database, date, location, city, true);

@@ -741,16 +741,22 @@ public class DataBaseHandler {
         return returnInfo;
     }
 
-
-
-
-
-
-
-
-
-
-
+    public void checkBranchExists(String location, String city) throws InputException {
+        try {
+            PreparedStatement ps = connection.prepareStatement("SELECT COUNT(*) as num FROM Vehicle " +
+                    "WHERE location = ? AND city = ?");
+            ps.setString(1, location);
+            ps.setString(2, city);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            int count = rs.getInt("num");
+            if (count == 0) {
+                throw new InputException("Branch does not exist!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
 
 
@@ -771,6 +777,7 @@ public class DataBaseHandler {
                 ps.setTimestamp(1, Timestamp.valueOf(start));
                 ps.setTimestamp(2, Timestamp.valueOf(end));
             } else if (!location.equals("") && !city.equals("")) {
+                checkBranchExists(location, city);
                 ps = connection.prepareStatement("SELECT rid, r.vlicense AS vlicense, dlicense,  " +
                         "fromDate, toDate, r.odometer AS odometer, cardName, cardNo, ExpDate, confNo, " +
                         "v.location as location, v.city as city, v.vtname as vtname " +
@@ -891,6 +898,7 @@ public class DataBaseHandler {
                 ps.setTimestamp(1, Timestamp.valueOf(start));
                 ps.setTimestamp(2, Timestamp.valueOf(end));
             } else if (!location.equals("") && !city.equals("")) {
+                checkBranchExists(location, city);
                 ps = connection.prepareStatement("SELECT ret.rid AS rid, rdate, ret.odometer AS odometer, fulltank," +
                         " value,  v.location as location, v.city as city, v.vtname as vtname FROM Rent r, Vehicle v," +
                         " Return ret WHERE ret.rid = r.rid AND ? <= rdate AND ? >= rdate AND v.vlicense = r.vlicense  " +
