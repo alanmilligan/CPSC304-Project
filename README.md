@@ -1,8 +1,8 @@
 # Car Rental/Reservation Database
-The purpose of this project is to build a Car Rental/Reservation Database allowing:
-* Users to sign up, search available rentals in their area, calculate estimated cost, and make a rental or reserve for later
-* Clerks to sign out a rental, pre-made reservation, or view company, branch, and location-wide reports
-* Administrators to view and edit all the records in the database
+The purpose of this project is to build a Car Rental/Reservation Database:
+* **Customer View:** Users to sign up, search available rentals in their area, calculate estimated cost, and make a rental or reserve for later
+* **Clerk View:** Clerks can sign out a rental, pre-made reservation, or view company, branch, and location-wide reports
+* **Table View** Administrators to view and edit all the records in the database
 
 Uses: Java, Oracle SQL, Java Database Connectivity (JDBC)
 ## Screenshots
